@@ -1,0 +1,135 @@
+[
+  {
+    "libelle": "Basique",
+    "options": [
+      {
+        "libelle": "Berline",
+        "prix": 1000.0
+      },
+      {
+        "libelle": "SUV",
+        "prix": 1500.0
+      },
+      {
+        "libelle": "Taxi",
+        "prix": 800.0
+      },
+      {
+        "libelle": "MiniCar",
+        "prix": 2000.0
+      }
+    ]
+  },
+  {
+    "libelle": "Standard",
+    "options": [
+      {
+        "libelle": "Berline",
+        "prix": 1500.0
+      },
+      {
+        "libelle": "SUV",
+        "prix": 2000.0
+      },
+      {
+        "libelle": "Taxi",
+        "prix": 1000.0
+      },
+      {
+        "libelle": "MiniCar",
+        "prix": 2500.0
+      }
+    ]
+  },
+  {
+    "libelle": "Premium",
+    "options": [
+      {
+        "libelle": "Berline",
+        "prix": 3000.0
+      },
+      {
+        "libelle": "SUV",
+        "prix": 5000.0
+      }
+    ]
+  },
+  {
+    "libelle": "Prestige",
+    "options": [
+      {
+        "libelle": "Berline",
+        "prix": 10000.0
+      },
+      {
+        "libelle": "SUV",
+        "prix": 15000.0
+      }
+    ]
+  },
+  {
+    "libelle": "VVIP",
+    "options": [
+      {
+        "libelle": "Berline",
+        "prix": 20000.0
+      },
+      {
+        "libelle": "SUV",
+        "prix": 25000.0
+      }
+    ]
+  },
+  {
+    "libelle": "Lavage moteur",
+    "options": [
+      {
+        "libelle": "Diesel",
+        "prix": 7000.0
+      },
+      {
+        "libelle": "Essence",
+        "prix": 5000.0
+      }
+    ]
+  },
+  {
+    "libelle": "Chassis",
+    "options": [
+      {
+        "libelle": "Berline",
+        "prix": 3000.0
+      },
+      {
+        "libelle": "SUV",
+        "prix": 5000.0
+      }
+    ]
+  },
+  {
+    "libelle": "Entretien fauteuil",
+    "options": [
+      {
+        "libelle": "Cuir",
+        "prix": 15000.0
+      },
+      {
+        "libelle": "Tissu",
+        "prix": 5000.0
+      }
+    ]
+  },
+  {
+    "libelle": "Lustrage/Polissage",
+    "options": [
+      {
+        "libelle": "Berline",
+        "prix": 15000.0
+      },
+      {
+        "libelle": "SUV",
+        "prix": 20000.0
+      }
+    ]
+  }
+]
