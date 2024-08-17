@@ -47,4 +47,8 @@ class UserNotifier extends Notifier<List<User>> {
   void remove(User u) {
     state = state.where((elt) => elt.username != u.username).toList();
   }
+
+  int nbUsers() {
+    return state.length;
+  }
 }
