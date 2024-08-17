@@ -48,7 +48,7 @@ class UserNotifier extends Notifier<List<User>> {
     state = state.where((elt) => elt.username != u.username).toList();
   }
 
-  int nbUsers() {
+  int totalUsers() {
     return state.length;
   }
 }
