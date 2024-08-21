@@ -1,4 +1,4 @@
-import 'package:autoclean/models/tarifs.dart';
+import 'package:autoclean/features/tarification/models/tarifs.dart';
 import 'package:autoclean/services/tarif_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

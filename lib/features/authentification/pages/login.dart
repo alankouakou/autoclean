@@ -1,29 +1,49 @@
 import 'package:autoclean/main_page.dart';
 
-import 'package:autoclean/signup.dart';
+import 'signup.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Login extends StatefulWidget {
+import '../services/auth_service.dart';
+
+class Login extends ConsumerStatefulWidget {
   const Login({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  ConsumerState<Login> createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
-  final TextEditingController _loginController = TextEditingController();
+class _LoginState extends ConsumerState<Login> {
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = true;
+  String response = '';
 
   @override
   void dispose() {
-    _loginController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
+  void checkHisto() async {
+    final sp = await SharedPreferences.getInstance();
+    response = sp.getString('historique') ?? '{}';
+  }
+
+  Future<void> signinWithEmailAndPassword(String email, String password) async {
+    final user = await AuthService().signinWithEmailAndPassword(
+        email: _emailController.text, password: _passwordController.text);
+    if (user != null) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const MainPage()));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    checkHisto();
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -35,8 +55,8 @@ class _LoginState extends State<Login> {
                       .headlineLarge
                       ?.copyWith(color: Colors.teal)),
               Container(
-                  height: 200.0,
-                  width: 200.0,
+                  height: 180.0,
+                  width: 180.0,
                   padding: const EdgeInsets.symmetric(
                       vertical: 10.0, horizontal: 10.0),
                   child: const CircleAvatar(
@@ -47,7 +67,7 @@ class _LoginState extends State<Login> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: TextField(
-                  controller: _loginController,
+                  controller: _emailController,
                   decoration: const InputDecoration(
                       contentPadding: EdgeInsets.symmetric(horizontal: 30),
                       border: OutlineInputBorder(
@@ -57,7 +77,7 @@ class _LoginState extends State<Login> {
                           borderSide: BorderSide(color: Colors.teal),
                           borderRadius:
                               BorderRadius.all(Radius.circular(30.0))),
-                      hintText: 'Username',
+                      hintText: 'E-mail',
                       suffixIcon: Icon(Icons.person)),
                 ),
               ),
@@ -102,18 +122,8 @@ class _LoginState extends State<Login> {
                     const EdgeInsets.symmetric(vertical: 0, horizontal: 30.0),
                 child: OutlinedButton(
                     onPressed: () {
-                      if (_loginController.text == 'test' &&
-                          _passwordController.text == 'test') {
-                        _loginController.clear();
-                        _passwordController.clear();
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MainPage()));
-                      } else {
-                        _loginController.clear();
-                        _passwordController.clear();
-                      }
+                      signinWithEmailAndPassword(
+                          _emailController.text, _passwordController.text);
                     },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -149,3 +159,8 @@ class _LoginState extends State<Login> {
         ));
   }
 }
+
+
+/*
+
+*/

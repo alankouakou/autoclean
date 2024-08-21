@@ -1,4 +1,4 @@
-import 'package:autoclean/models/option_tarif.dart';
+import 'package:autoclean/features/tarification/models/option_tarif.dart';
 
 class Tarif {
   final String libelle;

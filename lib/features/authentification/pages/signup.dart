@@ -1,3 +1,5 @@
+import 'package:autoclean/features/authentification/services/auth_service.dart';
+import 'package:autoclean/main_page.dart';
 import 'package:flutter/material.dart';
 
 final _formKey = GlobalKey<FormState>();
@@ -10,11 +12,19 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  final _loginController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _repeatPasswordController = TextEditingController();
   bool isVisible = true;
-  List loginCrees = ['admin', 'superadmin', 'user', 'alan', 'naomie', 'cesar'];
+
+  Future<void> signUp(String email, String password) async {
+    final user = await AuthService().createUserWithEmailAndPassword(
+        email: _emailController.text, password: _passwordController.text);
+    if (user != null) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const MainPage()));
+    }
+  }
 
   void toggleVisibility() {
     setState(
@@ -36,7 +46,7 @@ class _SignUpState extends State<SignUp> {
               child: Column(children: [
                 const Padding(
                   padding: EdgeInsets.only(bottom: 20.0),
-                  child: Text('Signup Page',
+                  child: Text('Nouveau compte',
                       style: TextStyle(
                           fontSize: 22,
                           color: Colors.teal,
@@ -45,15 +55,13 @@ class _SignUpState extends State<SignUp> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10.0),
                   child: TextFormField(
-                    controller: _loginController,
+                    controller: _emailController,
                     validator: (value) => value!.isEmpty
-                        ? null
-                        : loginCrees.contains(value)
-                            ? 'Login existe déjà'
-                            : null, // Le login doit être unique
+                        ? 'Rensaignez le champ e-mail'
+                        : null, // Le login doit être unique
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: InputDecoration(
-                        hintText: 'Login',
+                        hintText: 'E-mail',
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                             borderSide: BorderSide.none),
@@ -111,41 +119,10 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-                // FilledButton(onPressed: () {},style: ButtonStyle(shape: RoundedRectangleBorder()), child: const Text('Valider')),
                 ElevatedButton(
                   onPressed: () {
-                    _formKey.currentState!.validate();
-                    loginCrees.add(_loginController.text);
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) => SizedBox(
-                        height: 400,
-                        width: double.infinity,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Center(
-                              child: Text(
-                                  'Compte ${_loginController.text} ajouté!'),
-                            ),
-                            ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    fixedSize: const Size(double.infinity, 50),
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.teal,
-                                    shape: RoundedRectangleBorder(
-                                        side: BorderSide.none,
-                                        borderRadius:
-                                            BorderRadius.circular(8.0))),
-                                child: const Text('OK'))
-                          ],
-                        ),
-                      ),
-                    );
+                    // _formKey.currentState!.validate();
+                    signUp(_emailController.text, _passwordController.text);
                   },
                   style: ElevatedButton.styleFrom(
                       fixedSize: const Size(double.infinity, 50),
@@ -173,15 +150,3 @@ class _SignUpState extends State<SignUp> {
     return resultCheck;
   }
 }
-
-
-/*
-value.length < 8
-            ? 'Le mot de passe doit comporter au minimum 8 caractères'
-            : !value.contains(RegExp(r'[0-9]{1,}'))
-                ? 'Le mot de passe doit comporter un chiffre'
-                : !value.contains(
-                        RegExp(r'[$€¨¿@&§°\’\"\!\^\*\-\_\+\/\(\)]{1,}'))
-                    ? 'Le mot de passe doit comporter un caractère spécial'
-                    : null;
-*/

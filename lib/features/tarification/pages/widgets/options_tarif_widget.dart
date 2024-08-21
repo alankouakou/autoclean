@@ -1,10 +1,11 @@
 import 'dart:math';
 
 import 'package:autoclean/core/utils.dart';
-import 'package:autoclean/models/prestation.dart';
-import 'package:autoclean/models/tarifs.dart';
+import 'package:autoclean/features/prestations/models/prestation.dart';
+import 'package:autoclean/features/tarification/models/tarifs.dart';
+import 'package:autoclean/providers/caisse_notifier.dart';
 import 'package:autoclean/providers/tarifs_provider.dart';
-import 'package:autoclean/saisie_prestation.dart';
+import 'package:autoclean/features/prestations/pages/saisie_prestation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -98,9 +99,14 @@ class OptionTarifWidget extends ConsumerWidget {
                                         annulee: false,
                                         datePrestation: DateTime.now(),
                                         detailsVehicule: '');
+                                    ref.read(prestationsProvider.notifier)
+                                      ..add(p)
+                                      ..save();
+
+                                    //met à jour le solde de caisse
                                     ref
-                                        .read(prestationsProvider.notifier)
-                                        .add(p);
+                                        .read(caisseNotifierProvider.notifier)
+                                        .add(option.prix);
                                     Navigator.pop(context);
                                   },
                                   style: ElevatedButton.styleFrom(

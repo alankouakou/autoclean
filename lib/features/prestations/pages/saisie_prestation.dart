@@ -1,9 +1,10 @@
 import 'dart:math';
 
-import 'package:autoclean/components/tarif_chips_widget.dart';
-import 'package:autoclean/components/options_tarif_widget.dart';
-import 'package:autoclean/models/prestation.dart';
-import 'package:autoclean/models/tarifs.dart';
+import 'package:autoclean/features/tarification/pages/widgets/tarif_chips_widget.dart';
+import 'package:autoclean/features/tarification/pages/widgets/options_tarif_widget.dart';
+import 'package:autoclean/features/prestations/models/prestation.dart';
+import 'package:autoclean/features/tarification/models/tarifs.dart';
+import 'package:autoclean/providers/caisse_notifier.dart';
 import 'package:autoclean/providers/prestation_provider.dart';
 import 'package:autoclean/providers/tarifs_provider.dart';
 import 'package:flutter/material.dart';
@@ -24,10 +25,13 @@ class SaisiePrestation extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final listeTarifs = ref.watch(tarifsFutureProvider);
+
     final prestations = ref.watch(prestationsProvider);
-    final soldeCaisse = ref.watch(prestationsProvider.notifier).totalCA();
-    final nbClients = ref.watch(prestationsProvider.notifier).count();
     final optionsTarif = ref.watch(selectedTarif);
+    final caissier = ref.watch(caisseNotifierProvider.notifier).nomCaissier();
+    final caisse = ref.watch(caisseNotifierProvider);
+    final totalPrestations = ref.read(prestationsProvider.notifier).totalCA();
+    final nbClients = ref.read(prestationsProvider.notifier).count();
 
     List<Tarif> allTarrifs = <Tarif>[];
 
@@ -84,14 +88,14 @@ class SaisiePrestation extends ConsumerWidget {
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFF3774D))),
-                          Text(formatCFA(soldeCaisse),
+                          Text(formatCFA(totalPrestations),
                               style: const TextStyle(
                                   fontSize: 26,
                                   color: Color(0xFFF3774D),
                                   fontWeight: FontWeight.bold)),
-                          const Text('',
-                              style: TextStyle(
-                                  color: Colors.teal,
+                          Text('$caissier ${caisse.soldeCaisse} FCFA',
+                              style: const TextStyle(
+                                  color: Color(0xFFF3774D),
                                   fontWeight: FontWeight.bold)),
                         ]),
                   ),

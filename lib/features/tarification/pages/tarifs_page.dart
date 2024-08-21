@@ -1,4 +1,4 @@
-import 'package:autoclean/components/tarif_list_widget.dart';
+import 'package:autoclean/features/tarification/pages/widgets/tarif_list_widget.dart';
 import 'package:flutter/material.dart';
 
 class TarifsPage extends StatelessWidget {

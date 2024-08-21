@@ -1,5 +1,5 @@
-import 'package:autoclean/models/statut_compte.dart';
-import 'package:autoclean/models/user.dart';
+import 'package:autoclean/features/authentification/models/statut_compte.dart';
+import 'package:autoclean/features/authentification/models/user.dart';
 
 class Compte {
   final int id;

@@ -1,6 +1,6 @@
 import 'dart:core';
 
-import 'package:autoclean/models/tarifs.dart';
+import 'package:autoclean/features/tarification/models/tarifs.dart';
 import 'package:flutter/services.dart';
 
 class TarifService {

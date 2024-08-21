@@ -1,3 +1,7 @@
+import 'package:intl/intl.dart';
+
+final df = DateFormat('dd/MM/yyyy HH:mm:ss');
+
 class Prestation {
   final int id;
   final String libelle;
@@ -20,13 +24,13 @@ class Prestation {
   });
 
   Prestation.fromJson(Map<String, dynamic> json)
-      : id = int.parse(json['id']),
+      : id = json['id'] as int,
         libelle = json['libelle'],
-        prix = json['prix'],
-        montantRecu = json['montantRecu'],
-        monnaie = json['monnaie'],
+        prix = json['prix'] as double,
+        montantRecu = json['montantRecu'] as double,
+        monnaie = json['monnaie'] as double,
         annulee = json['annulee'],
-        datePrestation = json['datePrestation'],
+        datePrestation = df.parse(json['datePrestation']),
         detailsVehicule = json['detailsVehicule'];
 
   Map<String, dynamic> toJson() => {
@@ -36,7 +40,7 @@ class Prestation {
         'montantRecu': montantRecu,
         'monnaie': monnaie,
         'annulee': annulee,
-        'datePrestation': datePrestation,
+        'datePrestation': df.format(datePrestation),
         'detailsVehicule': detailsVehicule
       };
 }

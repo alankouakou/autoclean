@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDSxFsPatETq6GqjcQo-8sa6XJSTJy5BnI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>983223031453</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>ci.onetek.autoclean</string>
+	<key>PROJECT_ID</key>
+	<string>autoclean-a9797</string>
+	<key>STORAGE_BUCKET</key>
+	<string>autoclean-a9797.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:983223031453:ios:9b7a0b1318a734105e6674</string>
+</dict>
+</plist>

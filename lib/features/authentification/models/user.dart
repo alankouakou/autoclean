@@ -1,5 +1,5 @@
-import 'package:autoclean/models/compte.dart';
-import 'package:autoclean/models/role.dart';
+import 'package:autoclean/features/authentification/models/compte.dart';
+import 'package:autoclean/features/authentification/models/role.dart';
 import 'package:equatable/equatable.dart';
 
 class User extends Equatable {

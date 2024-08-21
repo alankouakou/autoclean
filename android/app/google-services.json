@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "983223031453",
+    "project_id": "autoclean-a9797",
+    "storage_bucket": "autoclean-a9797.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983223031453:android:53fee611ddf454405e6674",
+        "android_client_info": {
+          "package_name": "ci.onetek.autoclean"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXSyFdzhK-mliMUe2yoBF5mdrAzb5o3Lw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
