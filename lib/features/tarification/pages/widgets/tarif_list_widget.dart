@@ -1,5 +1,5 @@
 import 'package:autoclean/core/utils.dart';
-import 'package:autoclean/providers/tarifs_provider.dart';
+import 'package:autoclean/features/tarification/services/tarifs_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

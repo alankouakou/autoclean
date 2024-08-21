@@ -1,3 +1,4 @@
+import 'package:autoclean/features/authentification/pages/reset_password.dart';
 import 'package:autoclean/main_page.dart';
 
 import 'signup.dart';
@@ -49,7 +50,7 @@ class _LoginState extends ConsumerState<Login> {
         body: SafeArea(
           child: Center(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Text('Car Wash Manager v1.0',
+              Text('Car Wash v1.0',
                   style: Theme.of(context)
                       .textTheme
                       .headlineLarge
@@ -116,6 +117,21 @@ class _LoginState extends ConsumerState<Login> {
                               icon: const Icon(Icons.visibility_off))),
                 ),
               ),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ResetPasswordPage())),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 50.0),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text('Mot de passe oublié?',
+                        style:
+                            TextStyle(fontSize: 14, color: Color(0xFFFF6F00))),
+                  ),
+                ),
+              ),
               const SizedBox(height: 10.0),
               Padding(
                 padding:
@@ -153,7 +169,8 @@ class _LoginState extends ConsumerState<Login> {
                             color: Color(0xFFFF6F00))),
                   )
                 ],
-              )
+              ),
+              const SizedBox(height: 30),
             ]),
           ),
         ));

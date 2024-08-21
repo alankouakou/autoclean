@@ -4,9 +4,9 @@ import 'package:autoclean/features/tarification/pages/widgets/tarif_chips_widget
 import 'package:autoclean/features/tarification/pages/widgets/options_tarif_widget.dart';
 import 'package:autoclean/features/prestations/models/prestation.dart';
 import 'package:autoclean/features/tarification/models/tarifs.dart';
-import 'package:autoclean/providers/caisse_notifier.dart';
-import 'package:autoclean/providers/prestation_provider.dart';
-import 'package:autoclean/providers/tarifs_provider.dart';
+import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
+import 'package:autoclean/features/prestations/services/prestation_provider.dart';
+import 'package:autoclean/features/tarification/services/tarifs_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';

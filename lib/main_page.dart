@@ -1,7 +1,7 @@
 import 'package:autoclean/features/prestations/pages/caisse_page.dart';
 import 'package:autoclean/features/authentification/pages/login.dart';
 import 'package:autoclean/features/prestations/pages/saisie_prestation.dart';
-import 'package:autoclean/stats_page.dart';
+import 'package:autoclean/features/prestations/pages/stats/stats_page.dart';
 import 'package:autoclean/features/tarification/pages/tarifs_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
