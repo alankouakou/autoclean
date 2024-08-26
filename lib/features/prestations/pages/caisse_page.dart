@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final df = DateFormat('HH:mm:ss');
+final dfDate = DateFormat('dd/MM/yyyy');
 final dfFull = DateFormat('dd/MM/yyyy HH:mm:ss');
 
 class CaissePage extends StatefulWidget {
@@ -93,23 +94,29 @@ class _CaissePageState extends State<CaissePage> {
                           margin: const EdgeInsets.all(5.0),
                           color: Colors.white,
                           child: ListTile(
-                            leading: Text(df.format(prestation.datePrestation),
+                            leading: Text(
+                                dfDate.format(prestation.datePrestation),
                                 style: const TextStyle(
                                     color: Color(0xFFF3774D),
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14)),
-                            title: Text(prestation.libelle,
-                                style: const TextStyle(fontSize: 14)),
-                            //subtitle: Text(prestations[index].detailsVehicule),
-                            trailing: Text(formatCFA(prestation.prix),
-                                style: const TextStyle(fontSize: 14)),
+                            title: Text(prestation.detailsVehicule,
+                                style: const TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.bold)),
+
+/*                             trailing: Column(
+                              children: [
+                                Text(formatCFA(prestation.prix),
+                                    style: const TextStyle(fontSize: 14))
+                              ],
+                            ), */
                           ),
                         ),
                       );
                     },
                   );
                 } else {
-                  return Text('No data');
+                  return const Text('No data');
                 }
               }),
         )

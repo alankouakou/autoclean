@@ -18,6 +18,7 @@ class AuthStatePage extends StatelessWidget {
             return MainPage(firebaseAuthId: firebaseAuthId);
           } else {
             return const LoginNew();
+            //TODO supprimer Login du projet (ou remplacer par LoginNew)
           }
         });
   }

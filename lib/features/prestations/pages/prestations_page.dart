@@ -221,7 +221,7 @@ class PrestationsPage extends ConsumerWidget {
                                       color: Color(0xFFF3774D),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14)),
-                              title: Text(prestation.libelle,
+                              title: Text(prestation.detailsVehicule,
                                   style: const TextStyle(fontSize: 14)),
                               //subtitle: Text(prestations[index].detailsVehicule),
                               trailing: Text(formatCFA(prestation.prix),

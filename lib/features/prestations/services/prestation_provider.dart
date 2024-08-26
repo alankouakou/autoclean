@@ -50,8 +50,9 @@ class PrestationsNotifier extends Notifier<List<Prestation>> {
         .map((item) => Prestation.fromFirestore(item))
         .where((p) => p.accountId == accountId)
         .toList();
-    _prestations.clear();
+/*     _prestations.clear();
     _prestations.addAll(temp);
+ */
     state = [...temp];
   }
 
