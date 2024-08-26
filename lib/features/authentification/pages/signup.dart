@@ -22,7 +22,9 @@ class _SignUpState extends State<SignUp> {
         email: _emailController.text, password: _passwordController.text);
     if (user != null) {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const MainPage()));
+          context,
+          MaterialPageRoute(
+              builder: (context) => MainPage(firebaseAuthId: user.uid)));
     }
   }
 

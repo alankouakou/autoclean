@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:autoclean/features/prestations/models/prestation.dart';
+import 'package:autoclean/features/prestations/services/firestore_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,24 +16,62 @@ final df = DateFormat('d/M/y HH:mm:ss');
 
 final restoreData = StateProvider<bool>((ref) => false);
 
+final prestationsStreamProvider = StreamProvider<QuerySnapshot>((ref) {
+  final fireStoreProvider = ref.watch(firestoreProvider);
+
+  return fireStoreProvider.getPrestations();
+});
+
 final prestationsNotifierProvider =
     NotifierProvider<PrestationsNotifier, List<Prestation>>(
         PrestationsNotifier.new);
 
 class PrestationsNotifier extends Notifier<List<Prestation>> {
-  final prestations = <Prestation>[];
+  final firestore = FirestoreService();
+  final List<Prestation> _prestations = [];
+
   @override
   List<Prestation> build() {
-    final bool restore = ref.watch(restoreData);
-    print('Inside prestationProvider. Valeur de restore: $restore');
+    getFromFirestore();
 
-    if (restore) initPrestations();
-    return prestations;
+    return _prestations;
   }
 
-  void add(Prestation p) {
-    state = [p, ...state];
+  void add(Prestation p) async {
+    firestore.addPrestation(p);
     print('prestation ${p.libelle} ajoutée');
+
+    final sp = await SharedPreferences.getInstance();
+    final accountId = sp.getString('firebase_auth_uid');
+
+    final dataFromFirestore = await firestore.dataFromFirestore();
+
+    var temp = dataFromFirestore.docs
+        .map((item) => Prestation.fromFirestore(item))
+        .where((p) => p.accountId == accountId)
+        .toList();
+    _prestations.clear();
+    _prestations.addAll(temp);
+    state = [...temp];
+  }
+
+  List<Prestation> get prestations => _prestations;
+
+  void getFromFirestore() async {
+    final sp = await SharedPreferences.getInstance();
+    final accountId = sp.getString('firebase_auth_uid');
+
+    final dataFromFirestore = await firestore.dataFromFirestore();
+
+    var temp = dataFromFirestore.docs
+        .map((item) => Prestation.fromFirestore(item))
+        .where((p) => p.accountId == accountId)
+        .toList();
+    _prestations.clear();
+
+    _prestations.addAll(temp);
+
+    //state = [...temp];
   }
 
   void clear() {
@@ -52,20 +92,7 @@ class PrestationsNotifier extends Notifier<List<Prestation>> {
     var jsonString = jsonEncode(state.map((p) => p.toJson()).toList());
 
     sp.setString('historique', jsonString);
-
-    //print(jsonString);
   }
 
-  void initPrestations() async {
-    var sp = await SharedPreferences.getInstance();
-    var rawData = sp.getString('historique') ?? '{}';
-
-    print('init: $rawData');
-
-    var jsonData = jsonDecode(rawData);
-    if (jsonData.length > 0) {
-      prestations.addAll(List<Prestation>.from(
-          jsonData.map((element) => Prestation.fromJson(element))));
-    }
-  }
+  void initPrestations() async {}
 }

@@ -16,7 +16,7 @@ String formatCFA(double amount) {
 }
 
 String capitalize(String name) {
-  if (name.isNotEmpty) {
+  if (name.isNotEmpty && name.length > 2) {
     return '${name[0].toUpperCase()}${name.substring(1).toLowerCase()}';
   } else {
     return '';

@@ -1,17 +1,19 @@
 import 'package:autoclean/features/prestations/pages/caisse_page.dart';
 import 'package:autoclean/features/authentification/pages/login.dart';
-import 'package:autoclean/features/prestations/pages/saisie_prestation.dart';
+import 'package:autoclean/features/prestations/pages/prestations_page.dart';
 import 'package:autoclean/features/prestations/pages/stats/stats_page.dart';
 import 'package:autoclean/features/tarification/pages/tarifs_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:autoclean/features/authentification/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final indexProvider = StateProvider<int>((ref) => 0);
 
 class MainPage extends ConsumerStatefulWidget {
-  const MainPage({super.key});
+  const MainPage({super.key, required this.firebaseAuthId});
+  final String firebaseAuthId;
 
   @override
   ConsumerState<MainPage> createState() => _MainPageState();
@@ -20,10 +22,16 @@ class MainPage extends ConsumerStatefulWidget {
 class _MainPageState extends ConsumerState<MainPage> {
   signOut() {
     AuthService().signOut();
-    Navigator.pushAndRemoveUntil(
+    /*   Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const Login()),
         (route) => false);
+ */
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -32,7 +40,7 @@ class _MainPageState extends ConsumerState<MainPage> {
     Color selectedColor = Colors.teal.shade300;
 
     List<Widget> body = [
-      const SaisiePrestation(),
+      PrestationsPage(accountId: widget.firebaseAuthId),
       const CaissePage(),
       const StatsPage(),
       const TarifsPage(),

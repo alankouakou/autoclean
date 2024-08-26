@@ -40,6 +40,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         onPressed: () async {
                           await _authService
                               .resetPassword(emailController.text);
+                          Navigator.pop(context);
                           //
                         },
                         style: ElevatedButton.styleFrom(

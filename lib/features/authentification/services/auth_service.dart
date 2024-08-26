@@ -1,5 +1,6 @@
 import 'package:autoclean/core/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -14,8 +15,11 @@ class AuthService {
     try {
       final credential = await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
+      final sp = await SharedPreferences.getInstance();
       var user = credential.user;
       if (user != null) {
+        sp.setString('firebase_auth_uid',
+            user.uid); //stocke dans SharedPreferences le user UID
         return user;
       }
     } on FirebaseAuthException catch (e) {

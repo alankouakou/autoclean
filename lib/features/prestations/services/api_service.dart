@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 final apiServiceProvider = Provider.family<ApiService, String>((ref, periode) =>
     ApiService(
-        endPointUrl: 'https://www.yrieehotel.com/api/nuiteesdumois/$periode'));
+        endPointUrl: 'https://www.yrieehotel.com/api/prestations/$periode'));
 
 class ApiService {
   final String endPointUrl;

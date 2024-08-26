@@ -11,10 +11,11 @@ class CaisseNotifier extends Notifier<Caisse> {
     var dateOuverture = DateTime.now();
 
     return Caisse(
-        id: 1,
-        libelle: 'Journee du $dateOuverture',
-        caissier: '',
-        soldeCaisse: 0);
+      id: 1,
+      libelle: 'Journee du $dateOuverture',
+      caissier: '',
+      soldeCaisse: 0,
+    );
   }
 
   void open(double solde) {

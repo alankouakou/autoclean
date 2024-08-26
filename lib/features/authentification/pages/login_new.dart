@@ -1,21 +1,19 @@
 import 'package:autoclean/features/authentification/pages/reset_password.dart';
-import 'package:autoclean/main_page.dart';
 
 import 'signup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/auth_service.dart';
 
-class Login extends ConsumerStatefulWidget {
-  const Login({super.key});
+class LoginNew extends ConsumerStatefulWidget {
+  const LoginNew({super.key});
 
   @override
-  ConsumerState<Login> createState() => _LoginState();
+  ConsumerState<LoginNew> createState() => _LoginNewState();
 }
 
-class _LoginState extends ConsumerState<Login> {
+class _LoginNewState extends ConsumerState<LoginNew> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = true;
@@ -28,24 +26,13 @@ class _LoginState extends ConsumerState<Login> {
     super.dispose();
   }
 
-  void checkHisto() async {
-    final sp = await SharedPreferences.getInstance();
-    response = sp.getString('historique') ?? '{}';
-  }
-
   Future<void> signinWithEmailAndPassword(String email, String password) async {
     final user = await AuthService().signinWithEmailAndPassword(
         email: _emailController.text, password: _passwordController.text);
-    /*    if (user != null) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const MainPage()));
-    }
-  */
   }
 
   @override
   Widget build(BuildContext context) {
-    checkHisto();
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
