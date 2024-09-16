@@ -1,8 +1,6 @@
 import 'package:autoclean/features/authentification/pages/auth_state_page.dart';
 import 'package:autoclean/firebase_options.dart';
-import 'package:autoclean/features/authentification/pages/login.dart';
 import 'package:firebase_core/firebase_core.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,7 +24,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: AuthStatePage(),
+      home: const AuthStatePage(),
     );
   }
 }

@@ -56,7 +56,7 @@ class TarifListWidget extends ConsumerWidget {
                             backgroundColor: couleurs[indexCouleur % nbCouleurs]
                                 .withOpacity(0.9),
                             label: Text(
-                                '${option.libelle} ${formatCFA(option.prix)}',
+                                '${option.libelle} ${Utils.formatCFA(option.prix)}',
                                 style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold)),

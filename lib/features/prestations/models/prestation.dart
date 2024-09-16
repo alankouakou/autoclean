@@ -1,7 +1,5 @@
+import 'package:autoclean/core/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
-
-final df = DateFormat('dd/MM/yyyy HH:mm:ss');
 
 class Prestation {
   final int id;
@@ -12,6 +10,7 @@ class Prestation {
   final bool annulee;
   final DateTime datePrestation;
   final String detailsVehicule;
+  final String? caisseId;
   final String accountId; // indique si la prestation est annulée
 
   const Prestation(
@@ -23,6 +22,7 @@ class Prestation {
       required this.annulee,
       required this.datePrestation,
       required this.detailsVehicule,
+      this.caisseId,
       required this.accountId});
 
   Prestation.fromJson(Map<String, dynamic> json)
@@ -32,11 +32,14 @@ class Prestation {
         montantRecu = json['montantRecu'] as double,
         monnaie = json['monnaie'] as double,
         annulee = json['annulee'],
-        datePrestation = df.parse(json['datePrestation']),
+        datePrestation = Utils.dateFull.parse(json['datePrestation']),
         detailsVehicule = json['detailsVehicule'],
+        caisseId = json['caisseId'],
         accountId = json['accountId'];
 
   factory Prestation.fromFirestore(QueryDocumentSnapshot document) {
+    //print(document['datePrestation']);
+
     return Prestation(
         id: document['id'],
         libelle: document['libelle'],
@@ -44,8 +47,9 @@ class Prestation {
         montantRecu: document['montantRecu'] as double,
         monnaie: document['monnaie'] as double,
         annulee: document['annulee'],
-        datePrestation: df.parse(document['datePrestation']),
+        datePrestation: Utils.dateFull.parse(document['datePrestation']),
         detailsVehicule: document['detailsVehicule'],
+        caisseId: document['caisseId'],
         accountId: document['accountId']);
   }
 
@@ -56,8 +60,9 @@ class Prestation {
         'montantRecu': montantRecu,
         'monnaie': monnaie,
         'annulee': annulee,
-        'datePrestation': df.format(datePrestation),
+        'datePrestation': Utils.dateFull.format(datePrestation),
         'detailsVehicule': detailsVehicule,
+        'caisseId': caisseId,
         'accountId': accountId
       };
 }

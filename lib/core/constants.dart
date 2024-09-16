@@ -10,3 +10,6 @@ const couleurs = [
   Colors.lightBlue,
   Color(0xFFF3774D)
 ];
+
+const colorSaumon = Color(0xFFF3774D);
+const colorTurquoise = Colors.teal;

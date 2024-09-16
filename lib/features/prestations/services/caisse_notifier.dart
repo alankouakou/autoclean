@@ -1,59 +1,54 @@
-import 'package:autoclean/core/utils.dart';
+import 'dart:async';
+
+import 'package:autoclean/features/authentification/services/auth_service.dart';
 import 'package:autoclean/features/prestations/models/caisse.dart';
+import 'package:autoclean/features/prestations/services/caisse_service.dart';
+import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+//Id de la caisse en cours
+final caisseIdProvider = StateProvider<String>((ref) => '');
+
 final caisseNotifierProvider =
-    NotifierProvider<CaisseNotifier, Caisse>(() => CaisseNotifier());
+    AutoDisposeAsyncNotifierProvider<CaisseNotifier, Caisse>(
+        CaisseNotifier.new);
 
-class CaisseNotifier extends Notifier<Caisse> {
+class CaisseNotifier extends AutoDisposeAsyncNotifier<Caisse> {
   @override
-  Caisse build() {
-    var dateOuverture = DateTime.now();
-
-    return Caisse(
-      id: 1,
-      libelle: 'Journee du $dateOuverture',
-      caissier: '',
-      soldeCaisse: 0,
-    );
+  FutureOr<Caisse> build() {
+    return fetchCaisse();
   }
 
-  void open(double solde) {
-    state.dateOuverture = DateTime.now();
-    state.soldeCaisse = solde;
+  Future<Caisse> fetchCaisse() async {
+    final auth = ref.watch(authProvider);
+    final caisseService = ref.watch(caisseProvider);
+    final userUID = auth.currentUser!.uid;
+    String id;
+
+    //Récuperer l'id de la caisse ouverte
+    id = await caisseService.getIdCaisseOuverte(userAccountId: userUID) ?? '';
+    //si l'Id est non nul, Recuperer la caisse
+    if (id.isEmpty) {
+      id = await caisseService.createNew(userUID);
+    }
+    ref.read(caisseIdProvider.notifier).state = id;
+    print('fetch caisse - caisse ID : $id');
+    return fetchById(id);
+    // Si l'id est nul, réer une nlle caisse et la récuperer
   }
 
-  void close(double solde) {
-    state.dateFermeture = DateTime.now();
-    state.soldeCaisse = solde;
+  Future<Caisse> fetchById(String id) async {
+    final caisseService = ref.watch(caisseProvider);
+    final caisse = await caisseService.getById(id);
+    return caisse;
   }
 
-  add(double amount) {
-    state.soldeCaisse += amount;
+  Future<String> maj(Caisse newValue, String id) async {
+    final caisseService = ref.watch(caisseProvider);
+    final caisseId = await caisseService.update(newValue, id);
+    return caisseId;
   }
 
-  withdraw(double amount) {
-    state.soldeCaisse -= amount;
-  }
-
-  setCaissier(String name) {
-    state.caissier = name;
-  }
-
-  reset() {
-    state.soldeCaisse = 0;
-  }
-
-  double solde() {
-    return state.soldeCaisse;
-  }
-
-  String nomCaissier() {
-    return capitalize(state.caissier);
-  }
-
-  @override
-  String toString() {
-    return 'Caisse ${state.caissier} ${state.soldeCaisse} FCFA ouvert à ${state.dateOuverture}';
-  }
+  void setCaisse(String caisseId) async {}
 }

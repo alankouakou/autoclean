@@ -1,3 +1,4 @@
+import 'package:autoclean/features/authentification/services/auth_service.dart';
 import 'package:autoclean/features/tarification/models/tarifs.dart';
 import 'package:autoclean/features/tarification/services/tarif_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +8,10 @@ final apiTarif = Provider<TarifService>((ref) => TarifService());
 final tarifsFutureProvider = FutureProvider<List<Tarif>>(
   (ref) async {
     final tarifService = ref.watch(apiTarif);
-    return await tarifService.getTarifs();
+    final auth = ref.watch(authProvider);
+    final user_uid = auth.currentUser?.uid;
+    print('in TarifProvider. user UID: $user_uid');
+    return await tarifService.getListeTarifs(user_uid);
   },
 );
 

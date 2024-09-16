@@ -1,9 +1,11 @@
-import 'dart:convert';
+import 'dart:async';
 
 import 'package:autoclean/features/authentification/services/auth_service.dart';
 import 'package:autoclean/features/prestations/models/prestation.dart';
+import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
 import 'package:autoclean/features/prestations/services/caisse_service.dart';
 import 'package:autoclean/features/prestations/services/firestore_service.dart';
+import 'package:autoclean/features/prestations/services/histo_mvt_caisse_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,25 +15,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///
 /// A terme, les données proviendront d'un backend via une API
 
-final prestationsStreamProvider = StreamProvider<QuerySnapshot>((ref) {
-  final firestoreService = ref.watch(firestoreProvider);
+final histoPrestationsProvider =
+    AsyncNotifierProvider<HistoPrestationsNotifier, List<Prestation>>(
+        HistoPrestationsNotifier.new);
 
-  return firestoreService.getPrestations();
-});
-
-final prestationsNotifierProvider =
-    NotifierProvider<PrestationsNotifier, List<Prestation>>(
-        PrestationsNotifier.new);
-
-class PrestationsNotifier extends Notifier<List<Prestation>> {
+class HistoPrestationsNotifier extends AsyncNotifier<List<Prestation>> {
   final firestore = FirestoreService();
   final List<Prestation> _prestations = [];
 
   @override
-  List<Prestation> build() {
-    getFromFirestore();
-
-    return _prestations;
+  FutureOr<List<Prestation>> build() async {
+    final caisseId = ref.watch(histoCaisseIdProvider);
+    return getFromFirestore(caisseId: caisseId);
   }
 
   void add(Prestation p) async {
@@ -46,18 +41,13 @@ class PrestationsNotifier extends Notifier<List<Prestation>> {
         .map((item) => Prestation.fromFirestore(item))
         .where((p) => p.accountId == accountId)
         .toList();
-
-    state = [...temp];
   }
 
-  List<Prestation> get prestations => _prestations;
-
-  List<Prestation> getByCaisseId(String id) {
-    getFromFirestore(caisseId: id);
-    return [..._prestations];
+  Future<List<Prestation>> getByCaisseId(String id) async {
+    return getFromFirestore(caisseId: id);
   }
 
-  void getFromFirestore({String? caisseId}) async {
+  Future<List<Prestation>> getFromFirestore({String? caisseId}) async {
     final accountId = ref.watch(authProvider).currentUser?.uid ?? '';
 
     final dataFromFirestore = await firestore.dataFromFirestore();
@@ -70,28 +60,7 @@ class PrestationsNotifier extends Notifier<List<Prestation>> {
     if (caisseId != null && caisseId.isNotEmpty) {
       temp = temp.where((p) => p.caisseId == caisseId).toList();
     }
-    _prestations.clear();
 
-    _prestations.addAll(temp);
-  }
-
-  void clear() {
-    state.clear();
-  }
-
-  int count() {
-    return state.length;
-  }
-
-  double totalCA() {
-    return state.fold(
-        0.0, (acc, e) => acc + e.prix); // Somme des prestations à l'instant T
-  }
-
-  void save() async {
-    var sp = await SharedPreferences.getInstance();
-    var jsonString = jsonEncode(state.map((p) => p.toJson()).toList());
-
-    sp.setString('historique', jsonString);
+    return temp;
   }
 }

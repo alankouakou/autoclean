@@ -1,12 +1,13 @@
 import 'package:autoclean/features/authentification/pages/reset_password.dart';
-import 'package:autoclean/main_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'signup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/auth_service.dart';
+
+//final idCaisseOuverte = StateProvider.autoDispose<String>((ref) => '');
 
 class Login extends ConsumerStatefulWidget {
   const Login({super.key});
@@ -20,6 +21,7 @@ class _LoginState extends ConsumerState<Login> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = true;
   String response = '';
+  String caisse = '';
 
   @override
   void dispose() {
@@ -28,28 +30,23 @@ class _LoginState extends ConsumerState<Login> {
     super.dispose();
   }
 
-  void checkHisto() async {
-    final sp = await SharedPreferences.getInstance();
-    response = sp.getString('historique') ?? '{}';
-  }
-
   Future<void> signinWithEmailAndPassword(String email, String password) async {
     final user = await AuthService().signinWithEmailAndPassword(
         email: _emailController.text, password: _passwordController.text);
-    /*    if (user != null) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const MainPage()));
+    if (user != null) {
+      print('${user.email!} uid: ${user.uid} connecté!');
+      SharedPreferences sp = await SharedPreferences.getInstance();
+      caisse = sp.getString('caisseId_$email') ?? '';
     }
-  */
   }
 
   @override
   Widget build(BuildContext context) {
-    checkHisto();
+    final auth = ref.watch(authProvider);
     return Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
-          child: Center(
+          child: SingleChildScrollView(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Text('Car Wash v1.0',
                   style: Theme.of(context)
@@ -65,7 +62,7 @@ class _LoginState extends ConsumerState<Login> {
                     backgroundImage: AssetImage('assets/car.jpeg'),
                     radius: 70,
                   )),
-              //Image.asset('assets/car.jpeg')),
+              const SizedBox(height: 30),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: TextField(
@@ -132,9 +129,10 @@ class _LoginState extends ConsumerState<Login> {
                 padding:
                     const EdgeInsets.symmetric(vertical: 0, horizontal: 30.0),
                 child: OutlinedButton(
-                    onPressed: () {
-                      signinWithEmailAndPassword(
-                          _emailController.text, _passwordController.text);
+                    onPressed: () async {
+                      await auth.signinWithEmailAndPassword(
+                          email: _emailController.text,
+                          password: _passwordController.text);
                     },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,

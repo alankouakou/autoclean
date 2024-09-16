@@ -1,115 +1,147 @@
 import 'package:autoclean/core/utils.dart';
-import 'package:autoclean/features/prestations/models/prestation.dart';
-import 'package:autoclean/features/prestations/services/firestore_service.dart';
+import 'package:autoclean/features/authentification/services/auth_service.dart';
+import 'package:autoclean/features/prestations/models/caisse.dart';
+import 'package:autoclean/features/prestations/pages/histo_caisse.dart';
+import 'package:autoclean/features/prestations/pages/historique_caisse.dart';
+import 'package:autoclean/features/prestations/services/caisse_service.dart';
+import 'package:autoclean/features/prestations/services/histo_mvt_caisse_provider.dart';
+import 'package:autoclean/features/prestations/services/mvt_caisse_service.dart';
+import 'package:autoclean/features/prestations/services/prestation_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final df = DateFormat('HH:mm:ss');
-final dfDate = DateFormat('dd/MM/yyyy');
-final dfFull = DateFormat('dd/MM/yyyy HH:mm:ss');
+import '../services/caisse_notifier.dart';
 
-class CaissePage extends StatefulWidget {
+class CaissePage extends ConsumerStatefulWidget {
   const CaissePage({super.key});
 
   @override
-  State<CaissePage> createState() => _CaissePageState();
+  ConsumerState<CaissePage> createState() => _CaissePageState();
 }
 
-class _CaissePageState extends State<CaissePage> {
+class _CaissePageState extends ConsumerState<CaissePage> {
   late final SharedPreferences sp;
   String accountId = '';
 
-  void getUserUID() async {
-    sp = await SharedPreferences.getInstance();
-    accountId = sp.getString('firebase_auth_uid')!;
-    print('--Inside getUserUID-- $accountId');
-  }
-
   @override
   void initState() {
-    getUserUID();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final firestoreService = FirestoreService();
+    final userUID = ref.watch(authProvider).currentUser!.uid;
+    final caisseService = ref.watch(caisseProvider);
     print('Inside build method - accountId : $accountId');
     return Scaffold(
         body: SafeArea(
             child: Padding(
       padding: const EdgeInsets.only(top: 30.0, left: 5, right: 5),
       child: Column(children: [
-        const Text('Historique',
+        const Text('Récap. journées',
             style: TextStyle(
                 fontSize: 22, color: Colors.teal, fontWeight: FontWeight.bold)),
         const SizedBox(height: 30),
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
-              stream: firestoreService.getPrestations(),
+              stream: caisseService.getCaisses(userUID),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  final prestations = snapshot.data!.docs
-                      .where((element) => element['accountId'] == accountId)
+                  final caisses = snapshot.data!.docs
+                      .where((e) => e['accountId'] == userUID)
                       .toList();
                   return ListView.builder(
-                    itemCount: prestations.length,
+                    itemCount: caisses.length,
                     itemBuilder: (context, index) {
-                      final prestation = Prestation.fromJson(
-                          prestations[index].data() as Map<String, dynamic>);
+                      final docId = caisses[index].id;
+                      final caisse = Caisse.fromJson(
+                          caisses[index].data() as Map<String, dynamic>);
                       return GestureDetector(
+                        onTap: () {
+                          ref.read(histoCaisseIdProvider.notifier).state =
+                              docId;
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => HistoriqueCaisse(
+                                  dateOuverture: caisse.dateOuverture!,
+                                  dateFermeture:
+                                      caisse.dateFermeture ?? DateTime.now())));
+                        },
                         onLongPress: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                      content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(prestation.detailsVehicule,
-                                                style: const TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            Text(
-                                                '${prestation.libelle} ${formatCFA(prestation.prix)}'),
-                                            Text(dfFull.format(
-                                                prestation.datePrestation)),
-                                            const SizedBox(height: 30),
-                                          ]),
-                                      actions: [
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.blue),
-                                            child: const Text('Fermer',
-                                                style: TextStyle(
-                                                    color: Colors.white)))
-                                      ]));
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 20.0),
+                              width: double.infinity,
+                              height: 300,
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Center(
+                                      child: Text(caisse.libelle,
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                    const SizedBox(height: 10.0),
+                                    Center(
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                          Text(
+                                              'De : ${Utils.dateFull.format(caisse.dateOuverture!)} '),
+                                          caisse.dateFermeture != null
+                                              ? Text(
+                                                  'à : ${Utils.dateFull.format((caisse.dateFermeture!))}')
+                                              : const Text(
+                                                  'Date fermeture: <vide>'),
+                                          Text(
+                                              'Recette: ${Utils.formatCFA(caisse.recette!)}'),
+                                          Text(docId),
+                                          Text(caisse.accountId!),
+                                        ])),
+                                    const SizedBox(height: 30),
+                                    Center(
+                                      child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.blue),
+                                          child: const Text('Fermer',
+                                              style: TextStyle(
+                                                  color: Colors.white))),
+                                    )
+                                  ]),
+                            ),
+                          );
                         },
                         child: Container(
                           margin: const EdgeInsets.all(5.0),
                           color: Colors.white,
                           child: ListTile(
                             leading: Text(
-                                dfDate.format(prestation.datePrestation),
+                                Utils.dateShort.format(caisse.dateOuverture!),
                                 style: const TextStyle(
-                                    color: Color(0xFFF3774D),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14)),
-                            title: Text(prestation.detailsVehicule,
-                                style: const TextStyle(
-                                    fontSize: 14, fontWeight: FontWeight.bold)),
+                                    //color: Color(0xFFF3774D),
 
-/*                             trailing: Column(
-                              children: [
-                                Text(formatCFA(prestation.prix),
-                                    style: const TextStyle(fontSize: 14))
-                              ],
-                            ), */
+                                    fontSize: 14)),
+                            title: Text(Utils.formatCFA(caisse.recette!),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                )),
+                            trailing: caisse.dateFermeture == null
+                                ? const Text('En cours',
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.blue))
+                                : Text('Fermée',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.green.shade800)),
                           ),
                         ),
                       );
@@ -122,33 +154,5 @@ class _CaissePageState extends State<CaissePage> {
         )
       ]),
     )));
-  }
-
-  Widget _inputText(String hint, TextInputType kbt) {
-    return TextField(
-        keyboardType: kbt,
-        decoration: InputDecoration(
-            contentPadding: const EdgeInsets.only(left: 30, right: 30),
-            hintText: hint,
-            filled: true,
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-                borderSide: BorderSide.none),
-            fillColor: Colors.grey.shade300));
-  }
-
-  Widget _btn(
-      {required BuildContext context,
-      required String caption,
-      required Color couleur}) {
-    return ElevatedButton(
-        onPressed: () {
-          //Navigator.pop(context);
-        },
-        style: ElevatedButton.styleFrom(
-            minimumSize: const Size(200, 50),
-            backgroundColor: couleur,
-            foregroundColor: Colors.white),
-        child: Text(caption));
   }
 }

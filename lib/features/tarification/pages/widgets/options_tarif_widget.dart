@@ -1,7 +1,11 @@
 import 'dart:math';
 
 import 'package:autoclean/core/utils.dart';
+import 'package:autoclean/features/authentification/services/auth_service.dart';
+import 'package:autoclean/features/prestations/models/caisse.dart';
 import 'package:autoclean/features/prestations/models/prestation.dart';
+import 'package:autoclean/features/prestations/pages/new_caisse_page.dart';
+import 'package:autoclean/features/prestations/services/caisse_service.dart';
 // import 'package:autoclean/features/prestations/services/firestore_service.dart';
 import 'package:autoclean/features/tarification/models/tarifs.dart';
 import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
@@ -25,8 +29,9 @@ class OptionTarifWidget extends ConsumerStatefulWidget {
 class _OptionTarifWidgetState extends ConsumerState<OptionTarifWidget> {
   final _formKey = GlobalKey<FormState>();
   // final firestore = FiresStoreService();
-  late final SharedPreferences sp;
   late final String? accountId;
+  late final String? caisseId;
+  late final SharedPreferences sp;
 
   final _detailsVehiculeController = TextEditingController();
 
@@ -37,8 +42,9 @@ class _OptionTarifWidgetState extends ConsumerState<OptionTarifWidget> {
   }
 
   void getUserUID() async {
-    sp = await SharedPreferences.getInstance();
+    final sp = await SharedPreferences.getInstance();
     accountId = sp.getString('firebase_auth_uid');
+    //caisseId = sp.getString('caisseId');
   }
 
   @override
@@ -51,6 +57,8 @@ class _OptionTarifWidgetState extends ConsumerState<OptionTarifWidget> {
   Widget build(BuildContext context) {
     final currentTarrifName = ref.watch(selectedTarifName);
     //final nomTarif = ref.watch(selectedTarifName);
+    final caisse = ref.watch(caisseProvider);
+    //final caisseIdFuture = ref.watch(caisseFutureProvider);
 
     return ActionChip(
         side: BorderSide.none,
@@ -87,7 +95,7 @@ class _OptionTarifWidgetState extends ConsumerState<OptionTarifWidget> {
                                 Container(
                                     alignment: Alignment.center,
                                     child: Text(
-                                        '${widget.option.libelle} : ${formatCFA(widget.option.prix)}',
+                                        '${widget.option.libelle} : ${Utils.formatCFA(widget.option.prix)}',
                                         style: const TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold))),
@@ -125,6 +133,10 @@ class _OptionTarifWidgetState extends ConsumerState<OptionTarifWidget> {
                                           onPressed: () async {
                                             if (_formKey.currentState!
                                                 .validate()) {
+                                              var caisseId = await caisse
+                                                  .getIdCaisseOuverte(
+                                                      userAccountId:
+                                                          accountId!);
                                               var p = Prestation(
                                                   id: Random().hashCode,
                                                   libelle:
@@ -139,6 +151,7 @@ class _OptionTarifWidgetState extends ConsumerState<OptionTarifWidget> {
                                                   detailsVehicule:
                                                       _detailsVehiculeController
                                                           .text,
+                                                  caisseId: caisseId,
                                                   accountId: accountId!);
                                               // firestore.addPrestation(p);
                                               ref.read(
@@ -147,10 +160,10 @@ class _OptionTarifWidgetState extends ConsumerState<OptionTarifWidget> {
                                                 ..save();
 
                                               //met à jour le solde de caisse
-                                              ref
+                                              /* ref
                                                   .read(caisseNotifierProvider
                                                       .notifier)
-                                                  .add(widget.option.prix);
+                                                  .add(widget.option.prix); */
                                               _detailsVehiculeController
                                                   .clear();
                                               Navigator.pop(context);

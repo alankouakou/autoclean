@@ -1,0 +1,19 @@
+[
+  {
+    "libelle": "Basique",
+    "options": [
+      {
+        "libelle": "Berline",
+        "prix": 1000.0
+      },
+      {
+        "libelle": "4x4",
+        "prix": 1500.0
+      },
+      {
+        "libelle": "Taxi",
+        "prix": 1000.0
+      }
+    ]
+  }
+]
