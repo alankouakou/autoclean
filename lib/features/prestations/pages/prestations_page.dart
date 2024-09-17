@@ -226,8 +226,8 @@ class PrestationsPage extends ConsumerWidget {
                         child: StreamBuilder<QuerySnapshot>(
                             stream: firestoreService.getPrestations(),
                             builder: (context, snapshot) {
-                              print(
-                                  'Inside StreamBuilder fireBaseAuthId: $accountUserId, caisse:$caisseId');
+                              //  print(
+                              //      'Inside StreamBuilder fireBaseAuthId: $accountUserId, caisse:$caisseId');
 
                               if (snapshot.hasData) {
                                 final prestations = snapshot.data!.docs

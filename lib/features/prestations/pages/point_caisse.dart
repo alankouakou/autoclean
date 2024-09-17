@@ -195,7 +195,8 @@ class PointCaisse extends ConsumerWidget {
                                         final newData = data.copyWith(
                                           dateFermeture: dateFermeture,
                                           recette: montantTotalPrestations +
-                                              totalMvtsEntree,
+                                              totalMvtsEntree -
+                                              totalMvtsSortie,
                                         );
                                         //maj Backend
                                         ref

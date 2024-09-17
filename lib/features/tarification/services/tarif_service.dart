@@ -1,22 +1,26 @@
 import 'dart:convert';
 import 'dart:core';
-import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:autoclean/features/tarification/models/tarifs.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path_provider/path_provider.dart';
 
 class TarifService {
   List<Tarif> tarifs = [];
 
   Future<List<Tarif>> getListeTarifs(String? userUID) async {
-// si tarif inexistant, charger tarif par defaut (assets/tarifs.json)
+    final prefs = await SharedPreferences.getInstance();
     final remoteTarif = await getRemoteTarif(userUID);
-    final localTarif = await rootBundle.loadString('assets/tarifs.json');
-    print('Remote tarif: $remoteTarif');
+    final bundleTarif = await rootBundle.loadString('assets/tarifs.json');
+
+    // print('Remote tarif: $remoteTarif');
     //var jsonString = remoteTarif.isNotEmpty ? remoteTarif : localTarif;
-    var jsonString = localTarif;
+    if (remoteTarif.isNotEmpty) {
+      prefs.setString('tarifs', remoteTarif);
+    }
+    var jsonString = prefs.getString('tarifs') ?? bundleTarif;
 
     tarifs = tarifFromJson(jsonString);
 
@@ -24,9 +28,11 @@ class TarifService {
   }
 
   Future<Tarif> getTarif(String nom) async {
+    final prefs = await SharedPreferences.getInstance();
+
     var jsonString = await rootBundle.loadString('assets/tarifs.json');
 
-    tarifs = tarifFromJson(jsonString);
+    tarifs = tarifFromJson(prefs.getString('tarifs') ?? jsonString);
 
     return tarifs.firstWhere(
         (t) => t.libelle.toLowerCase().contains(nom.toLowerCase()),
@@ -55,6 +61,7 @@ class TarifService {
           FirebaseStorage.instance.ref().child(filedir).child('tarifs.json');
 
       result = await fileRef.getDownloadURL();
+
       print('Firebase storage: Download Url ---> $result');
 
       final rawJson = await fileRef.getData();

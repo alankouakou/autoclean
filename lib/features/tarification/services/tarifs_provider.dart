@@ -11,7 +11,10 @@ final tarifsFutureProvider = FutureProvider<List<Tarif>>(
     final auth = ref.watch(authProvider);
     final user_uid = auth.currentUser?.uid;
     print('in TarifProvider. user UID: $user_uid');
-    return await tarifService.getListeTarifs(user_uid);
+    var listTarifs = await tarifService.getListeTarifs(user_uid);
+    // print('Liste tarifs');
+    //print(listTarifs.map((e) => e.libelle).toList());
+    return listTarifs;
   },
 );
 
