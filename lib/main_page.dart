@@ -2,12 +2,11 @@ import 'package:autoclean/core/utils.dart';
 import 'package:autoclean/features/prestations/pages/caisse_page.dart';
 import 'package:autoclean/features/prestations/pages/list_mvt_caisse.dart';
 import 'package:autoclean/features/prestations/pages/prestations_page.dart';
-import 'package:autoclean/features/prestations/pages/saisie_mvt_caisse.dart';
+
 import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
 import 'package:autoclean/features/tarification/pages/tarifs_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'features/printing/services/printing_service.dart';
 
 import 'package:autoclean/features/authentification/services/auth_service.dart';
 

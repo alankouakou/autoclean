@@ -1,7 +1,6 @@
 import 'package:autoclean/core/utils.dart';
 import 'package:autoclean/features/prestations/models/mouvement_caisse.dart';
 import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
-import 'package:autoclean/features/prestations/services/caisse_service.dart';
 import 'package:autoclean/features/prestations/services/mvt_caisse_service.dart';
 import 'package:flutter/material.dart';
 
@@ -24,12 +23,11 @@ class _SaisieMvtCaisseState extends ConsumerState<SaisieMvtCaisse> {
   @override
   Widget build(BuildContext context) {
     final idCaisse = ref.watch(caisseIdProvider);
-    final mvtCaisseNotifier = ref.watch(mvtCaisseNotifierProvider);
+
     final dateDuJour = DateTime.now();
 
     print('Build saisie_mvt_caisse, caisseIdProvider value: $idCaisse');
 
-    final caisseMgr = ref.watch(caisseNotifierProvider);
     double largeurComposant = (MediaQuery.of(context).size.width - 50) / 2;
     return Scaffold(
       backgroundColor: Colors.grey.shade100,

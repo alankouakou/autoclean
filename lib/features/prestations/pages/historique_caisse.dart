@@ -1,8 +1,5 @@
-import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
 import 'package:autoclean/features/prestations/services/histo_prestation_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils.dart';

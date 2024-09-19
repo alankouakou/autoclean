@@ -1,13 +1,12 @@
 import 'dart:ui';
 
-import 'package:autoclean/core/constants.dart';
 import 'package:autoclean/core/utils.dart';
 import 'package:autoclean/features/prestations/models/mouvement_caisse.dart';
 import 'package:autoclean/features/prestations/pages/saisie_mvt_caisse.dart';
 import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
 import 'package:autoclean/features/prestations/services/mvt_caisse_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ListMvtsCaisse extends ConsumerWidget {
@@ -19,7 +18,7 @@ class ListMvtsCaisse extends ConsumerWidget {
     final caisseNotifier = ref.watch(caisseNotifierProvider);
     double totalMvtsEntree = 0;
     double totalMvtsSortie = 0;
-    late double montantMvts;
+
     mvtCaisseNotifier.when(
         data: (data) {
           totalMvtsEntree = data
@@ -29,17 +28,9 @@ class ListMvtsCaisse extends ConsumerWidget {
           totalMvtsSortie = data
               .where((m) => m.typeMouvement == 'Sortie')
               .fold(0.0, (acc, m) => acc + m.montant);
-
-          montantMvts = data.fold(0.0, (total, m) {
-            if (m.typeMouvement == 'Entree') {
-              return total + m.montant;
-            } else {
-              return total - m.montant;
-            }
-          });
         },
-        loading: () => montantMvts = 0,
-        error: (e, s) => montantMvts = 0);
+        loading: () => null,
+        error: (e, s) => null);
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -68,20 +59,6 @@ class ListMvtsCaisse extends ConsumerWidget {
                       Text(Utils.dateFull.format(caisse.dateOuverture!),
                           style: const TextStyle(fontSize: 16)),
                       const SizedBox(height: 5.0),
-                      /* RichText(
-                          text: TextSpan(
-                              text: 'Total mouvements:',
-                              style: const TextStyle(
-                                  fontSize: 18, color: Colors.teal),
-                              children: [
-                            const TextSpan(text: ' '),
-                            TextSpan(
-                                text: Utils.formatCFA(montantMvts),
-                                style: const TextStyle(
-                                  color: Color(0xFFF3774D),
-                                  fontSize: 20,
-                                ))
-                          ])), */
                       Text(
                           'Total Entrées : ${Utils.formatCFA(totalMvtsEntree)}',
                           style: const TextStyle(
