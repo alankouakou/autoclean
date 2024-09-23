@@ -1,55 +1,36 @@
+import 'package:autoclean/features/authentification/services/auth_service.dart';
+import 'package:autoclean/features/prestations/pages/prestations_page.dart';
 import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
+import 'package:autoclean/features/prestations/services/firestore_service.dart';
 import 'package:autoclean/features/prestations/services/histo_prestation_provider.dart';
+import 'package:autoclean/features/prestations/services/prestation_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils.dart';
 import '../../printing/services/printing_service.dart';
-import '../models/caisse.dart';
-import '../models/mouvement_caisse.dart';
 import '../models/prestation.dart';
-import '../services/caisse_service.dart';
 import '../services/histo_mvt_caisse_provider.dart';
 
-class HistoriqueCaisse extends ConsumerWidget {
-  const HistoriqueCaisse(
-      {required this.dateOuverture, required this.dateFermeture, super.key});
-  final DateTime dateOuverture;
-  final DateTime dateFermeture;
+class Dashboard extends ConsumerWidget {
+  const Dashboard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final caisseRefId = ref.watch(histoCaisseIdProvider);
-    final asyncValuePrestations = ref.watch(histoPrestationsProvider);
-    final asyncValueMvtsCaisse = ref.watch(histoMvtsCaisseProvider);
-    final halfScreenwidth = (MediaQuery.of(context).size.width - 26) / 2;
+    late final DateTime dateOuverture;
+    final firestoreService = FirestoreService();
 
+    final auth = AuthService();
+    final prestations = ref.watch(prestationsStreamProvider);
+    final halfScreenwidth = (MediaQuery.of(context).size.width - 26) / 2;
+    final futureCaisse = ref.watch(caisseNotifierProvider);
+    String caisseId = ref.watch(caisseIdProvider);
+    final mvtsCaisse = ref.watch(mvtsCaisseProvider);
     double totalMvts = 0.0;
     double totalRecette = 0.0;
     double soldeCaisse = 0.0;
-    List<MouvementCaisse> mvtCaisses = [];
-    List<Prestation> prestations = [];
-    bool isWaitingPrint = false;
-
-    asyncValueMvtsCaisse.when(
-      data: (data) {
-        mvtCaisses = data;
-      },
-      error: (e, s) {},
-      loading: () => const Center(child: CircularProgressIndicator()),
-    );
-
-    asyncValuePrestations.when(
-      data: (data) {
-        prestations = data;
-      },
-      error: (e, s) {
-        print(e.toString());
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-    );
-
-    //late final Caisse caisse;
 
     return DefaultTabController(
       length: 3,
@@ -71,22 +52,34 @@ class HistoriqueCaisse extends ConsumerWidget {
                 ),
               ],
             ),
-            title:
-                Text('Historique du ${Utils.dateShort.format(dateOuverture)}')),
+            title: const Text('Tableau de bord',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
+                    color: Colors.teal))),
         body: TabBarView(children: [
           Container(
             color: Colors.grey.shade100,
             child: Padding(
               padding:
-                  const EdgeInsets.symmetric(vertical: 20.0, horizontal: 8.0),
+                  const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  openCloseHoursWidget(
-                      dateOuverture, dateFermeture, halfScreenwidth),
+                  futureCaisse.when(
+                    data: (caisse) {
+                      //caisseId = caisse.id!;
+                      dateOuverture = caisse.dateOuverture!;
+                      return sessionWidget(
+                          dateOuverture, DateTime.now(), halfScreenwidth);
+                    },
+                    error: (e, s) => Container(),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                  ),
                   const SizedBox(height: 10.0),
-                  asyncValueMvtsCaisse.when(
+                  mvtsCaisse.when(
                       data: (data) {
                         final totalEntrees = data
                             .where((m) => m.typeMouvement == 'Entree')
@@ -94,7 +87,9 @@ class HistoriqueCaisse extends ConsumerWidget {
                         final totalSorties = data
                             .where((m) => m.typeMouvement == 'Sortie')
                             .fold(0.0, (acc, m) => acc + m.montant);
+
                         totalMvts = totalEntrees - totalSorties;
+
                         return Column(children: [
                           Container(
                             margin: const EdgeInsets.all(5.0),
@@ -124,88 +119,52 @@ class HistoriqueCaisse extends ConsumerWidget {
                       error: (e, s) => const Text('Une erreur est survenue!'),
                       loading: () =>
                           const Center(child: CircularProgressIndicator())),
-                  asyncValuePrestations.when(
-                      data: (data) {
-                        final somme = data.fold(0.0, (acc, p) => acc + p.prix);
-                        totalRecette = somme;
-                        soldeCaisse = totalRecette + totalMvts;
+                  prestations.when(
+                    data: (value) {
+                      final prestations = value.docs
+                          .where(
+                              (element) => element['accountId'] == auth.userId)
+                          .where((element) => element['caisseId'] == caisseId)
+                          .map((e) => Prestation.fromFirestore(e))
+                          .toList();
+                      final somme =
+                          prestations.fold(0.0, (acc, p) => acc + p.prix);
+                      totalRecette = somme;
+                      soldeCaisse = totalRecette + totalMvts;
 
-                        return Column(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.all(5.0),
-                              color: Colors.white,
-                              child: ListTile(
-                                  title: Text('Total Prestations ',
-                                      style: TextStyle(
-                                          //fontWeight: FontWeight.bold,
-                                          color: Colors.blue.shade800)),
-                                  trailing: Text(Utils.formatCFA(somme),
-                                      style: const TextStyle(fontSize: 14))),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.all(5.0),
-                              color: Colors.white,
-                              child: ListTile(
-                                  title: Text('Solde Caisse ',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.blue.shade800)),
-                                  trailing: Text(Utils.formatCFA(soldeCaisse),
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.blue.shade800,
-                                          fontWeight: FontWeight.bold))),
-                            ),
-                          ],
-                        );
-                      },
-                      error: (e, s) => const Placeholder(),
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator())),
-                  if (isWaitingPrint == true)
-                    const Center(child: CircularProgressIndicator()),
-                  Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0))),
-                      child: const Icon(
-                        Icons.print,
-                        color: Colors.white,
-                      ),
-                      onPressed: () async {
-                        isWaitingPrint = true;
-                        final caisseService = ref.watch(caisseProvider);
-                        final caisse = await caisseService.getById(caisseRefId);
-                        PrintingService.printDailyReport(
-                            caisse, mvtCaisses, prestations);
-                        isWaitingPrint = false;
-                      },
-                    ),
+                      return Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.all(5.0),
+                            color: Colors.white,
+                            child: ListTile(
+                                title: Text('Total Prestations ',
+                                    style: TextStyle(
+                                        //fontWeight: FontWeight.bold,
+                                        color: Colors.blue.shade800)),
+                                trailing: Text(Utils.formatCFA(somme),
+                                    style: const TextStyle(fontSize: 14))),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.all(5.0),
+                            color: Colors.white,
+                            child: ListTile(
+                                title: Text('Solde Caisse ',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue.shade800)),
+                                trailing: Text(Utils.formatCFA(soldeCaisse),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18))),
+                          ),
+                        ],
+                      );
+                    },
+                    error: (e, s) => Container(),
+                    loading: () => const CircularProgressIndicator(),
                   ),
-                  const SizedBox(height: 10.0),
-                  Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFFF3774D),
-                          side: const BorderSide(
-                              width: 1, color: Color(0xFFF3774D)),
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5.0))),
-                      child: const Text('Fermer',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18)),
-                      onPressed: () async {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  )
                 ],
               ),
             ),
@@ -215,11 +174,12 @@ class HistoriqueCaisse extends ConsumerWidget {
               child: Column(
                 children: [
                   Container(
+                      padding: const EdgeInsets.only(top: 20.0),
                       color: Colors.white,
                       width: double.infinity,
                       height: 50,
                       child: Center(
-                          child: asyncValueMvtsCaisse.when(
+                          child: mvtsCaisse.when(
                               data: (data) {
                                 final totalEntrees = data
                                     .where((m) => m.typeMouvement == 'Entree')
@@ -262,7 +222,7 @@ class HistoriqueCaisse extends ConsumerWidget {
                                   const Text('Une erreur est survenue'),
                               loading: () => const Center(
                                   child: CircularProgressIndicator())))),
-                  asyncValueMvtsCaisse.when(
+                  mvtsCaisse.when(
                       data: (data) {
                         return Expanded(
                             child: ListView.builder(
@@ -313,10 +273,17 @@ class HistoriqueCaisse extends ConsumerWidget {
                   width: double.infinity,
                   height: 50,
                   child: Center(
-                    child: asyncValuePrestations.when(
-                        data: (data) {
+                    child: prestations.when(
+                        data: (value) {
+                          final prestations = value.docs
+                              .where((element) =>
+                                  element['accountId'] == auth.userId)
+                              .where(
+                                  (element) => element['caisseId'] == caisseId)
+                              .map((e) => Prestation.fromFirestore(e))
+                              .toList();
                           final somme =
-                              data.fold(0.0, (acc, p) => acc + p.prix);
+                              prestations.fold(0.0, (acc, p) => acc + p.prix);
                           return Text(
                               'Total Prestations: ${Utils.formatCFA(somme)}',
                               style: TextStyle(
@@ -329,8 +296,14 @@ class HistoriqueCaisse extends ConsumerWidget {
                             const Center(child: CircularProgressIndicator())),
                   ),
                 ),
-                asyncValuePrestations.when(
-                  data: (listPrestations) {
+
+                /* prestations.when(
+                  data: (value) {
+                    final listPrestations = value.docs
+                        .where((element) => element['accountId'] == auth.userId)
+                        .where((element) => element['caisseId'] == caisseId)
+                        .map((e) => Prestation.fromFirestore(e))
+                        .toList();
                     return Expanded(
                       child: ListView.builder(
                           itemCount: listPrestations.length,
@@ -365,14 +338,138 @@ class HistoriqueCaisse extends ConsumerWidget {
                   },
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                )
+                ) */
+                Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: firestoreService.getPrestations(),
+                      builder: (context, snapshot) {
+                        //  print(
+                        //      'Inside StreamBuilder fireBaseAuthId: $accountUserId, caisse:$caisseId');
+
+                        if (snapshot.hasData) {
+                          final prestations = snapshot.data!.docs
+                              .where((element) =>
+                                  element['accountId'] == auth.userId)
+                              .where(
+                                  (element) => element['caisseId'] == caisseId)
+                              .toList();
+                          return ListView.builder(
+                            itemCount: prestations.length,
+                            itemBuilder: (context, index) {
+                              final prestation =
+                                  Prestation.fromFirestore(prestations[index]);
+                              return GestureDetector(
+                                onLongPress: () {
+                                  showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) => Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            alignment: Alignment.topCenter,
+                                            width: double.infinity,
+                                            height: 350,
+                                            //height: 300,
+                                            child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                      prestation
+                                                          .detailsVehicule,
+                                                      style: const TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  const SizedBox(height: 10),
+                                                  Text(prestation.libelle,
+                                                      style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  Text(
+                                                      Utils.formatCFA(
+                                                          prestation.prix),
+                                                      style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  Text(Utils.dateFull.format(
+                                                      prestation
+                                                          .datePrestation)),
+                                                  const SizedBox(height: 10),
+                                                  Text(prestation.caisseId!),
+                                                  Text(prestation.accountId),
+                                                  const SizedBox(height: 30),
+                                                  IconButton(
+                                                      onPressed: () {
+                                                        PrintingService
+                                                            .printReceipt(
+                                                                prestation);
+                                                      },
+                                                      icon: const Icon(
+                                                          size: 30.0,
+                                                          Icons.print,
+                                                          color: Color(
+                                                              0xFFF3774D))),
+                                                  const SizedBox(height: 20),
+                                                  ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.blue),
+                                                      child: const Text(
+                                                          'Fermer',
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .white))),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  )
+                                                ]),
+                                          ));
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.all(5.0),
+                                  color: Colors.white,
+                                  child: ListTile(
+                                    leading: Text(
+                                        Utils.timeShort
+                                            .format(prestation.datePrestation),
+                                        style: const TextStyle(
+                                            color: Color(0xFFF3774D),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14)),
+                                    title: Text(prestation.detailsVehicule,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 14)),
+                                    //subtitle: Text(prestations[index].detailsVehicule),
+                                    trailing: Text(
+                                        Utils.formatCFA(prestation.prix),
+                                        style: const TextStyle(fontSize: 14)),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        } else {
+                          return const Text('No data');
+                        }
+                      }),
+                ),
               ]))
         ]),
       ),
     );
   }
 
-  Widget openCloseHoursWidget(
+  Widget sessionWidget(
       DateTime dateOuverture, DateTime dateFermeture, double containerWidth) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -388,7 +485,7 @@ class HistoriqueCaisse extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Ouverture:',
+                  const Text('Ouvert depuis:',
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -406,20 +503,19 @@ class HistoriqueCaisse extends ConsumerWidget {
         Container(color: Colors.grey.withOpacity(0.5), height: 50, width: 2),
         SizedBox(
             width: containerWidth - 5,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 10.0),
+            child: const Padding(
+              padding: EdgeInsets.only(left: 10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Fermeture:',
+                  Text('Fermeture:',
                       style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFFF3774D))),
-                  Text(Utils.dateShort.format(dateFermeture),
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text(Utils.timeFull.format(dateFermeture),
-                      style: const TextStyle(
+                  Text('', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('',
+                      style: TextStyle(
                           fontSize: 22,
                           color: Color(0xFFF3774D),
                           fontWeight: FontWeight.bold))

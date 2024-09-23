@@ -29,8 +29,8 @@ class ListMvtsCaisse extends ConsumerWidget {
               .where((m) => m.typeMouvement == 'Sortie')
               .fold(0.0, (acc, m) => acc + m.montant);
         },
-        loading: () => null,
-        error: (e, s) => null);
+        loading: () {},
+        error: (e, s) {});
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,

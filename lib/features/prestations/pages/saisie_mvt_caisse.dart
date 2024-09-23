@@ -1,6 +1,7 @@
 import 'package:autoclean/core/utils.dart';
 import 'package:autoclean/features/prestations/models/mouvement_caisse.dart';
 import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
+import 'package:autoclean/features/prestations/services/histo_mvt_caisse_provider.dart';
 import 'package:autoclean/features/prestations/services/mvt_caisse_service.dart';
 import 'package:flutter/material.dart';
 
@@ -177,6 +178,7 @@ class _SaisieMvtCaisseState extends ConsumerState<SaisieMvtCaisse> {
                                           .addMvt(mvtCaisse);
                                       //Rafraichit le provider
                                       ref.invalidate(mvtCaisseNotifierProvider);
+                                      ref.invalidate(mvtsCaisseProvider);
                                       detailsController.clear();
                                       amountController.clear();
 

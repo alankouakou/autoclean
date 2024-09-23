@@ -1,5 +1,7 @@
 import 'package:autoclean/core/utils.dart';
+import 'package:autoclean/features/authentification/pages/config_page.dart';
 import 'package:autoclean/features/prestations/pages/caisse_page.dart';
+import 'package:autoclean/features/prestations/pages/dashboard.dart';
 import 'package:autoclean/features/prestations/pages/list_mvt_caisse.dart';
 import 'package:autoclean/features/prestations/pages/prestations_page.dart';
 
@@ -34,6 +36,51 @@ class _MainPageState extends ConsumerState<MainPage> {
     final selectedIndex = ref.watch(indexProvider);
     final auth = ref.watch(authProvider);
     final caisse = ref.watch(caisseNotifierProvider);
+    final isOwner = ref.watch(isOwnerProvider);
+
+    final employeeModedestinations = [
+      const NavigationDestination(
+          icon: Icon(Icons.home),
+          selectedIcon: Icon(Icons.home, color: Colors.white),
+          label: 'Accueil'),
+      const NavigationDestination(
+        icon: Icon(Icons.payments),
+        selectedIcon: Icon(Icons.payments, color: Colors.white),
+        label: 'Mvt caisse',
+      ),
+      const NavigationDestination(
+        icon: Icon(Icons.attach_money),
+        selectedIcon: Icon(Icons.attach_money, color: Colors.white),
+        label: 'Tarifs',
+      ),
+      const NavigationDestination(
+        icon: Icon(Icons.person),
+        selectedIcon: Icon(Icons.person, color: Colors.white),
+        label: 'Profil',
+      ),
+    ];
+
+    final ownerModedestinations = [
+      const NavigationDestination(
+          icon: Icon(Icons.home),
+          selectedIcon: Icon(Icons.home, color: Colors.white),
+          label: 'Accueil'),
+      const NavigationDestination(
+        icon: Icon(Icons.history),
+        selectedIcon: Icon(Icons.history, color: Colors.white),
+        label: 'Historique',
+      ),
+      const NavigationDestination(
+        icon: Icon(Icons.attach_money),
+        selectedIcon: Icon(Icons.attach_money, color: Colors.white),
+        label: 'Tarifs',
+      ),
+      const NavigationDestination(
+        icon: Icon(Icons.person),
+        selectedIcon: Icon(Icons.person, color: Colors.white),
+        label: 'Profil',
+      ),
+    ];
     caisse.when(
       data: (value) => print(
           'CaisseNotifierProvider: Caisse chargée avec succès UID: ${value.accountId}, date ouverture: ${Utils.dateFull.format(value.dateOuverture!)}'),
@@ -41,14 +88,22 @@ class _MainPageState extends ConsumerState<MainPage> {
           print('Erreur lors du chgt: ${error.toString()}'),
       loading: () => print('Chargement des données de la caisse'),
     );
-    Color selectedColor = Colors.teal.shade300;
+    Color selectedColor =
+        isOwner ? const Color(0xFFF3774D) : Colors.teal.shade300;
 
-    List<Widget> body = [
-      const PrestationsPage(),
-      const CaissePage(),
-      const ListMvtsCaisse(),
-      const TarifsPage(),
-    ];
+    List<Widget> body = isOwner
+        ? [
+            const Dashboard(),
+            const CaissePage(),
+            const TarifsPage(),
+            const ConfigPage()
+          ]
+        : [
+            const PrestationsPage(),
+            const ListMvtsCaisse(),
+            const TarifsPage(),
+            const ConfigPage()
+          ];
     return Scaffold(
         appBar: AppBar(
           actions: [
@@ -76,27 +131,8 @@ class _MainPageState extends ConsumerState<MainPage> {
           onDestinationSelected: (int index) {
             ref.read(indexProvider.notifier).state = index;
           },
-          destinations: const [
-            NavigationDestination(
-                icon: Icon(Icons.home),
-                selectedIcon: Icon(Icons.home, color: Colors.white),
-                label: 'Accueil'),
-            NavigationDestination(
-              icon: Icon(Icons.history),
-              selectedIcon: Icon(Icons.history, color: Colors.white),
-              label: 'Historique',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.payments),
-              selectedIcon: Icon(Icons.payments, color: Colors.white),
-              label: 'Mvt caisse',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.settings_outlined),
-              selectedIcon: Icon(Icons.settings_outlined, color: Colors.white),
-              label: 'Tarifs',
-            ),
-          ],
+          destinations:
+              isOwner ? ownerModedestinations : employeeModedestinations,
         ));
   }
 }

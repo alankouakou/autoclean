@@ -119,17 +119,3 @@ class CaisseService {
     return Caisse.fromFirestore(map: caisse);
   }
 }
-
-/*       //garder pour reference
-      _caisseOuverte = Caisse.fromJson({
-        'id': idCaisse.id,
-        'libelle': 'Journee du ${Utils.dateShort.format(maintenant)}',
-        'caissier': authService.currentUser!.email!,
-        'dateOuverture': Timestamp.now(),
-        'dateFermeture': null,
-        'soldeInitial': 0.0,
-        'recette': 0.0,
-        'accountId': userId
-      });
-      
-       */

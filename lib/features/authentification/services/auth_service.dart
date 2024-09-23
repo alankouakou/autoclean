@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final authProvider = Provider<AuthService>((ref) => AuthService());
+//TODO Logique à implementer: recuperer le mode en cours (Owner/Employee);
+final isOwnerProvider = StateProvider<bool>((ref) => false);
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -36,6 +38,8 @@ class AuthService {
         message = 'Verifiez e-mail ou mot de passe';
       } else if (e.code == 'user-disabled') {
         message = 'Votre compte est Inactif';
+      } else if (e.code == 'network-request-failed') {
+        message = 'Verifiez la connexion Internet!';
       } else {
         message = e.code;
       }
@@ -64,6 +68,8 @@ class AuthService {
         message = 'Ce compte existe déjà!';
       } else if (e.code == 'invalid-email') {
         message = 'E-mail invalide!';
+      } else if (e.code == 'network-request-failed') {
+        message = 'Verifiez la connexion Internet!';
       } else {
         message = e.code;
       }

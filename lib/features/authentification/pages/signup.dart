@@ -49,7 +49,7 @@ class _SignUpState extends State<SignUp> {
                   child: Text('Nouveau compte',
                       style: TextStyle(
                           fontSize: 22,
-                          color: Colors.teal,
+                          color: Color(0xFFF3774D),
                           fontWeight: FontWeight.bold)),
                 ),
                 Padding(
@@ -119,20 +119,22 @@ class _SignUpState extends State<SignUp> {
                     ),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    // _formKey.currentState!.validate();
-                    signUp(_emailController.text, _passwordController.text);
-                  },
-                  style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(double.infinity, 50),
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.teal,
-                      shape: RoundedRectangleBorder(
-                          side: BorderSide.none,
-                          borderRadius: BorderRadius.circular(8.0))),
-                  child: const Text('Créer le compte',
-                      style: TextStyle(fontSize: 16)),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      signUp(_emailController.text, _passwordController.text);
+                    },
+                    style: ElevatedButton.styleFrom(
+                        fixedSize: const Size(double.infinity, 50),
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.teal,
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide.none,
+                            borderRadius: BorderRadius.circular(8.0))),
+                    child: const Text('Créer le compte',
+                        style: TextStyle(fontSize: 16)),
+                  ),
                 )
               ]),
             ),

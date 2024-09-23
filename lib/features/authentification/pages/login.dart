@@ -1,7 +1,8 @@
 import 'package:autoclean/features/authentification/pages/reset_password.dart';
+import 'package:autoclean/features/authentification/pages/signup.dart';
+import 'package:autoclean/features/authentification/pages/stepper_signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'signup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -154,6 +155,7 @@ class _LoginState extends ConsumerState<Login> {
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
+                            //builder: (context) => const StepperSignup())),
                             builder: (context) => const SignUp())),
                     child: const Text('Créez un compte',
                         style: TextStyle(

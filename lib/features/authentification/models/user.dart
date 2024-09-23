@@ -1,45 +1,60 @@
-import 'package:autoclean/features/authentification/models/compte.dart';
-import 'package:autoclean/features/authentification/models/role.dart';
 import 'package:equatable/equatable.dart';
+import 'account.dart';
 
 class User extends Equatable {
   final String username;
-  final String name;
+  final String email;
   final String password;
-  final Role role;
-  final Compte compte;
+  final String role;
+  final Account account;
   final StatutUser statut;
+  final DateTime dateExpiration;
   final DateTime dateMaj;
 
   const User(
       {required this.username,
-      required this.name,
+      required this.email,
       required this.password,
       required this.role,
-      required this.compte,
+      required this.account,
       required this.statut,
+      required this.dateExpiration,
       required this.dateMaj});
 
   User copyWith(
       {String? username,
-      String? name,
+      String? email,
       String? password,
-      Role? role,
-      Compte? compte,
+      String? role,
+      Account? account,
       StatutUser? statut,
+      DateTime? dateExpiration,
       DateTime? dateMaj}) {
     return User(
         username: username ?? this.username,
-        name: name ?? this.name,
+        email: email ?? this.email,
         password: password ?? this.password,
         role: role ?? this.role,
-        compte: compte ?? this.compte,
+        account: account ?? this.account,
         statut: statut ?? this.statut,
+        dateExpiration: dateExpiration ?? this.dateExpiration,
         dateMaj: dateMaj ?? this.dateMaj);
   }
 
   @override
-  List<Object?> get props => [username, password];
+  List<Object?> get props => [email, password];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'username': username,
+      'email': email,
+      'password': password,
+      'role': role,
+      'account': account,
+      'statut': statut,
+      'dateExpiration': dateExpiration
+    };
+  }
 }
 
 enum StatutUser {
