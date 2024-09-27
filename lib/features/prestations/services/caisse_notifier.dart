@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:autoclean/features/authentification/services/auth_service.dart';
 import 'package:autoclean/features/prestations/models/caisse.dart';
 import 'package:autoclean/features/prestations/services/caisse_service.dart';
-import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,35 +1,35 @@
 import 'package:autoclean/core/utils.dart';
-import 'package:autoclean/features/prestations/models/mouvement_caisse.dart';
-import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
-import 'package:autoclean/features/prestations/services/histo_mvt_caisse_provider.dart';
-import 'package:autoclean/features/prestations/services/mvt_caisse_service.dart';
+import 'package:autoclean/features/authentification/services/auth_service.dart';
+import 'package:autoclean/features/laveurs/models/laveur.dart';
+import 'package:autoclean/features/laveurs/services/laveur_notifier.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SaisieMvtCaisse extends ConsumerStatefulWidget {
-  const SaisieMvtCaisse({super.key});
+class AjoutLaveur extends ConsumerStatefulWidget {
+  const AjoutLaveur({super.key});
 
   @override
-  ConsumerState<SaisieMvtCaisse> createState() => _SaisieMvtCaisseState();
+  ConsumerState<AjoutLaveur> createState() => _AjoutLaveurState();
 }
 
-List<String> options = ["Sortie", "Entree"];
+class _AjoutLaveurState extends ConsumerState<AjoutLaveur> {
+  TextEditingController contactController = TextEditingController();
+  TextEditingController nomController = TextEditingController();
 
-class _SaisieMvtCaisseState extends ConsumerState<SaisieMvtCaisse> {
-  String typeMouvement = options[0];
-  TextEditingController amountController = TextEditingController();
-  TextEditingController detailsController = TextEditingController();
+  @override
+  void dispose() {
+    contactController.dispose();
+    nomController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final idCaisse = ref.watch(caisseIdProvider);
+    final auth = ref.watch(authProvider);
+    final accountId = auth.currentUser!.uid;
 
-    final dateDuJour = DateTime.now();
-
-    print('Build saisie_mvt_caisse, caisseIdProvider value: $idCaisse');
-
-    double largeurComposant = (MediaQuery.of(context).size.width - 50) / 2;
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       body: SafeArea(
@@ -53,85 +53,41 @@ class _SaisieMvtCaisseState extends ConsumerState<SaisieMvtCaisse> {
                               borderRadius: BorderRadius.circular(10.0)),
                           child: Column(
                             children: [
-                              Text(
-                                  'Saisie caisse - ${Utils.dateShort.format(dateDuJour)}',
-                                  style: const TextStyle(
+                              const Text('Nouveau laveur',
+                                  style: TextStyle(
                                       color: Color(0xFFF3774D),
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20)),
-                              Text('Caisse Id: $idCaisse',
+                              Text('Compte: $accountId',
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Color(0xFFF3774D))),
                               const SizedBox(height: 20),
-                              SizedBox(
-                                height: 50,
-                                width: double.infinity,
-                                child: SizedBox(
-                                  width: largeurComposant,
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        SizedBox(
-                                          width: largeurComposant,
-                                          child: RadioListTile(
-                                            title: Text(options[0]),
-                                            value: options[0],
-                                            groupValue: typeMouvement,
-                                            onChanged: (value) {
-                                              setState(
-                                                () {
-                                                  typeMouvement = value!;
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: largeurComposant,
-                                          child: RadioListTile(
-                                            title: Text(options[1]),
-                                            value: options[1],
-                                            groupValue: typeMouvement,
-                                            onChanged: (value) {
-                                              setState(
-                                                () {
-                                                  typeMouvement = value!;
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ]),
-                                ),
-                              ),
                             ],
                           )),
                       const SizedBox(height: 20),
                       TextField(
-                        controller: detailsController,
+                        controller: nomController,
                         decoration: InputDecoration(
                           fillColor: Colors.white,
                           filled: true,
                           border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                               borderRadius: BorderRadius.circular(10.0)),
-                          hintText: 'Description...',
+                          hintText: 'Nom ',
                         ),
                       ),
                       const SizedBox(height: 20),
                       TextField(
                         keyboardType: TextInputType.number,
-                        controller: amountController,
+                        controller: contactController,
                         decoration: InputDecoration(
                           fillColor: Colors.white,
                           filled: true,
                           border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                               borderRadius: BorderRadius.circular(10.0)),
-                          hintText: 'Montant',
-                          suffixText: 'FCFA',
+                          hintText: 'Contact',
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -165,34 +121,25 @@ class _SaisieMvtCaisseState extends ConsumerState<SaisieMvtCaisse> {
                                 const SizedBox(width: 30),
                                 ElevatedButton(
                                     onPressed: () {
-                                      if (amountController.text.isNotEmpty &&
-                                          detailsController.text.isNotEmpty) {
-                                        final mvtCaisse = MouvementCaisse(
-                                            caisseId: idCaisse,
-                                            dateMaj: DateTime.now(),
-                                            details: detailsController.text,
-                                            montant: double.parse(
-                                                amountController.text),
-                                            typeMouvement: typeMouvement);
-                                        ref
-                                            .read(mvtCaisseNotifierProvider
-                                                .notifier)
-                                            .addMvt(mvtCaisse);
-                                        //Rafraichit le provider
-                                        ref.invalidate(
-                                            mvtCaisseNotifierProvider);
-                                        ref.invalidate(mvtsCaisseProvider);
-                                        detailsController.clear();
-                                        amountController.clear();
+                                      final laveur = Laveur(
+                                        id: '',
+                                        dateCreated: DateTime.now(),
+                                        nom: nomController.text,
+                                        contact: contactController.text,
+                                        actif: true,
+                                        accountId: accountId,
+                                      );
+                                      ref
+                                          .read(laveurProvider.notifier)
+                                          .add(laveur);
+                                      ref.invalidate(laveurProvider);
 
-                                        Utils.showSuccessMessage(
-                                            message:
-                                                'Mouvement caisse enregistré!');
-                                        Navigator.pop(context);
-                                      } else {
-                                        Utils.showErrorMessage(
-                                            message: 'Renseignez les champs!');
-                                      }
+                                      nomController.clear();
+                                      contactController.clear();
+
+                                      Utils.showSuccessMessage(
+                                          message: 'Laveur enregistré!');
+                                      Navigator.pop(context);
                                     },
                                     style: ElevatedButton.styleFrom(
                                         shape: RoundedRectangleBorder(

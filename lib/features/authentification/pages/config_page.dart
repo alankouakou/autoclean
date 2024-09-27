@@ -20,7 +20,9 @@ class ConfigPage extends ConsumerWidget {
         body: Center(
           child: Column(children: [
             Text('Profil actif: $libelleProfilActif',
-                style: const TextStyle(color: Colors.teal, fontSize: 20)),
+                style: ownerMode
+                    ? const TextStyle(color: Color(0xFFF3774D), fontSize: 20)
+                    : const TextStyle(color: Colors.teal, fontSize: 20)),
             const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () {
@@ -51,13 +53,17 @@ class ConfigPage extends ConsumerWidget {
                         });
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF3774D),
+                  // backgroundColor: const Color(0xFFF3774D),
+                  backgroundColor:
+                      ownerMode ? const Color(0xFFF3774D) : Colors.teal,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5.0))),
               child: ownerMode
-                  ? const Text('Basculer en mode Caissier')
-                  : const Text('Basculer en mode Propriétaire'),
+                  ? const Text('Basculer en mode Caissier',
+                      style: TextStyle(fontWeight: FontWeight.bold))
+                  : const Text('Basculer en mode Propriétaire',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ]),
         ));

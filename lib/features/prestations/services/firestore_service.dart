@@ -22,7 +22,7 @@ class FirestoreService {
     prestations.doc(docId).delete();
   }
 
-  void updatePrestation(String docId, Prestation newPrestation) {
+  void updatePrestation(String docId, Prestation newPrestation) async {
     prestations.doc(docId).update(newPrestation.toJson());
   }
 
@@ -49,5 +49,12 @@ class FirestoreService {
         await prestations.orderBy('datePrestation', descending: true).get();
     print('Inside firestore service: ${results.docs.length}');
     return results;
+  }
+
+  bulkAddField(String name) async {
+    final results = await prestations.get();
+    for (var doc in results.docs) {
+      await prestations.doc(doc.id).update({name: ''});
+    }
   }
 }

@@ -18,7 +18,7 @@ class _MyChoiceChipState extends ConsumerState<TarifChips> {
     return Container(
       color: Colors.white,
       child: SizedBox(
-        height: 70,
+        height: 60,
         width: double.infinity,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,

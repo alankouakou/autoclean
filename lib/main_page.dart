@@ -1,5 +1,6 @@
 import 'package:autoclean/core/utils.dart';
 import 'package:autoclean/features/authentification/pages/config_page.dart';
+import 'package:autoclean/features/laveurs/pages/list_laveurs.dart';
 import 'package:autoclean/features/prestations/pages/caisse_page.dart';
 import 'package:autoclean/features/prestations/pages/dashboard.dart';
 import 'package:autoclean/features/prestations/pages/list_mvt_caisse.dart';
@@ -49,6 +50,11 @@ class _MainPageState extends ConsumerState<MainPage> {
         label: 'Mvt caisse',
       ),
       const NavigationDestination(
+        icon: Icon(Icons.person),
+        selectedIcon: Icon(Icons.person, color: Colors.white),
+        label: 'Laveurs',
+      ),
+      const NavigationDestination(
         icon: Icon(Icons.attach_money),
         selectedIcon: Icon(Icons.attach_money, color: Colors.white),
         label: 'Tarifs',
@@ -69,6 +75,11 @@ class _MainPageState extends ConsumerState<MainPage> {
         icon: Icon(Icons.history),
         selectedIcon: Icon(Icons.history, color: Colors.white),
         label: 'Historique',
+      ),
+      const NavigationDestination(
+        icon: Icon(Icons.person),
+        selectedIcon: Icon(Icons.person, color: Colors.white),
+        label: 'Laveurs',
       ),
       const NavigationDestination(
         icon: Icon(Icons.attach_money),
@@ -95,12 +106,14 @@ class _MainPageState extends ConsumerState<MainPage> {
         ? [
             const Dashboard(),
             const CaissePage(),
+            const ListLaveurs(),
             const TarifsPage(),
             const ConfigPage()
           ]
         : [
             const PrestationsPage(),
             const ListMvtsCaisse(),
+            const ListLaveurs(),
             const TarifsPage(),
             const ConfigPage()
           ];

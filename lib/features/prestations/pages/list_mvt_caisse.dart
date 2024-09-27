@@ -78,10 +78,22 @@ class ListMvtsCaisse extends ConsumerWidget {
                                 builder: (context) => const SaisieMvtCaisse()));
                           },
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
+                              minimumSize: const Size(double.infinity, 50.0),
+                              backgroundColor: Colors.teal,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0))),
-                          child: const Icon(Icons.add, color: Colors.white)),
+                                  borderRadius: BorderRadius.circular(10.0))),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Ajouter',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white)),
+                              SizedBox(width: 10.0),
+                              Icon(Icons.add_box, color: Colors.white)
+                            ],
+                          )),
                       const SizedBox(height: 10.0),
                     ],
                   ),

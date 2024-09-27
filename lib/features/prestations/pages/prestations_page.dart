@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:autoclean/features/authentification/services/auth_service.dart';
+
 import 'package:autoclean/features/prestations/pages/point_caisse.dart';
 import 'package:autoclean/features/prestations/services/firestore_service.dart';
 import 'package:autoclean/features/printing/services/printing_service.dart';
@@ -193,35 +194,30 @@ class PrestationsPage extends ConsumerWidget {
                       // Liste tarifs
                       TarifChips(
                           tarifs: allTarrifs.map((t) => t.libelle).toList()),
-                      Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                        ),
-                        width: double.infinity,
-                        child: Wrap(
-                            spacing: 5,
-                            runSpacing: 5,
-                            children: optionsTarif.when(
-                                data: (currentTarrif) {
-                                  return currentTarrif.options
-                                      .map((option) => OptionTarifWidget(
-                                            option: option,
-                                            couleur: couleurs[Random()
-                                                .nextInt(couleurs.length - 1)],
-                                          ))
-                                      .toList();
-                                },
-                                error: (error, stackTrace) {
-                                  return [
-                                    Text(stackTrace.toString(),
-                                        style: const TextStyle(
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold))
-                                  ];
-                                },
-                                loading: () =>
-                                    [const CircularProgressIndicator()])),
-                      ),
+                      SizedBox(
+                          height: 50,
+                          child: optionsTarif.when(
+                              data: (tarif) {
+                                return ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    children: tarif.options
+                                        .map((option) => Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
+                                              child: OptionTarifWidget(
+                                                option: option,
+                                                couleur: couleurs[Random()
+                                                    .nextInt(
+                                                        couleurs.length - 1)],
+                                              ),
+                                            ))
+                                        .toList());
+                              },
+                              error: (e, s) => null,
+                              loading: () => const Center(
+                                  child: CircularProgressIndicator()))),
+
                       Expanded(
                         child: StreamBuilder<QuerySnapshot>(
                             stream: firestoreService.getPrestations(),
@@ -373,3 +369,36 @@ class PrestationsPage extends ConsumerWidget {
                     const Center(child: CircularProgressIndicator()))));
   }
 }
+
+
+                      /*
+                      Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                        ),
+                        width: double.infinity,
+                        child: Wrap(
+                            spacing: 5,
+                            runSpacing: 5,
+                            children: optionsTarif.when(
+                                data: (currentTarrif) {
+                                  return currentTarrif.options
+                                      .map((option) => OptionTarifWidget(
+                                            option: option,
+                                            couleur: couleurs[Random()
+                                                .nextInt(couleurs.length - 1)],
+                                          ))
+                                      .toList();
+                                },
+                                error: (error, stackTrace) {
+                                  return [
+                                    Text(stackTrace.toString(),
+                                        style: const TextStyle(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.bold))
+                                  ];
+                                },
+                                loading: () =>
+                                    [const CircularProgressIndicator()])),
+                      ),
+                      */

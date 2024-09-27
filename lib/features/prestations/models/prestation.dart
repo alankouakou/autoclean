@@ -10,7 +10,8 @@ class Prestation {
   final bool annulee;
   final DateTime datePrestation;
   final String detailsVehicule;
-  final String? caisseId;
+  final String caisseId;
+  final String laveur;
   final String accountId; // indique si la prestation est annulée
 
   const Prestation(
@@ -22,7 +23,8 @@ class Prestation {
       required this.annulee,
       required this.datePrestation,
       required this.detailsVehicule,
-      this.caisseId,
+      required this.caisseId,
+      required this.laveur,
       required this.accountId});
 
   Prestation.fromJson(Map<String, dynamic> json)
@@ -35,6 +37,7 @@ class Prestation {
         datePrestation = Utils.dateFull.parse(json['datePrestation']),
         detailsVehicule = json['detailsVehicule'],
         caisseId = json['caisseId'],
+        laveur = json['laveur'] ?? '',
         accountId = json['accountId'];
 
   factory Prestation.fromFirestore(QueryDocumentSnapshot document) {
@@ -50,6 +53,7 @@ class Prestation {
         datePrestation: Utils.dateFull.parse(document['datePrestation']),
         detailsVehicule: document['detailsVehicule'],
         caisseId: document['caisseId'],
+        laveur: document['laveur'] ?? '',
         accountId: document['accountId']);
   }
 
@@ -63,6 +67,7 @@ class Prestation {
         'datePrestation': Utils.dateFull.format(datePrestation),
         'detailsVehicule': detailsVehicule,
         'caisseId': caisseId,
+        'laveur': laveur,
         'accountId': accountId
       };
 }

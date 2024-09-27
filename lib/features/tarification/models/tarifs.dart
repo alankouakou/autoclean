@@ -34,19 +34,15 @@ class Tarif {
 class Option {
   final String libelle;
   final double prix;
+  final bool fixedPrice;
 
-  Option({
-    required this.libelle,
-    required this.prix,
-  });
+  Option({required this.libelle, required this.prix, this.fixedPrice = true});
 
   factory Option.fromJson(Map<String, dynamic> json) => Option(
-        libelle: json["libelle"],
-        prix: json["prix"],
-      );
+      libelle: json["libelle"],
+      prix: json["prix"],
+      fixedPrice: json["fixedPrice"] ?? true);
 
-  Map<String, dynamic> toJson() => {
-        "libelle": libelle,
-        "prix": prix,
-      };
+  Map<String, dynamic> toJson() =>
+      {"libelle": libelle, "prix": prix, "fixedPrice": fixedPrice};
 }
