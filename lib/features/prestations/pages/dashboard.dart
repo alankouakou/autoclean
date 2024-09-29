@@ -33,6 +33,7 @@ class Dashboard extends ConsumerWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        backgroundColor: Colors.grey.shade100,
         appBar: AppBar(
             bottom: const TabBar(
               tabs: [
@@ -167,102 +168,93 @@ class Dashboard extends ConsumerWidget {
               ),
             ),
           ),
-          Container(
-              color: Colors.grey.shade100,
-              child: Column(
-                children: [
-                  Container(
-                      padding: const EdgeInsets.only(top: 20.0),
-                      color: Colors.white,
-                      width: double.infinity,
-                      height: 50,
-                      child: Center(
-                          child: mvtsCaisse.when(
-                              data: (data) {
-                                final totalEntrees = data
-                                    .where((m) => m.typeMouvement == 'Entree')
-                                    .fold(0.0, (acc, m) => acc + m.montant);
-                                final totalSorties = data
-                                    .where((m) => m.typeMouvement == 'Sortie')
-                                    .fold(0.0, (acc, m) => acc + m.montant);
-                                return ListView(
-                                  scrollDirection: Axis.horizontal,
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 5.0),
-                                      color: Colors.white,
-                                      child: Text(
-                                          'Entrées: ${Utils.formatCFA(totalEntrees)}',
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: Colors.green.shade800)),
-                                    ),
-                                    Expanded(child: Container()),
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 5.0),
-                                      color: Colors.white,
-                                      child: Text(
-                                          'Sorties: -${Utils.formatCFA(totalSorties)}',
-                                          overflow: TextOverflow.ellipsis,
+          Column(
+            children: [
+              Container(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  color: Colors.white,
+                  width: double.infinity,
+                  height: 50,
+                  child: Center(
+                      child: mvtsCaisse.when(
+                          data: (data) {
+                            final totalEntrees = data
+                                .where((m) => m.typeMouvement == 'Entree')
+                                .fold(0.0, (acc, m) => acc + m.montant);
+                            final totalSorties = data
+                                .where((m) => m.typeMouvement == 'Sortie')
+                                .fold(0.0, (acc, m) => acc + m.montant);
+                            return ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 5.0),
+                                  color: Colors.white,
+                                  child: Text(
+                                      'Entrées: ${Utils.formatCFA(totalEntrees)}',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.green.shade800)),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 5.0),
+                                  color: Colors.white,
+                                  child: Text(
+                                      'Sorties: -${Utils.formatCFA(totalSorties)}',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.red)),
+                                ),
+                              ],
+                            );
+                          },
+                          error: (e, s) =>
+                              const Text('Une erreur est survenue'),
+                          loading: () => const Center(
+                              child: CircularProgressIndicator())))),
+              mvtsCaisse.when(
+                  data: (data) {
+                    return Expanded(
+                        child: ListView.builder(
+                            itemCount: data.length,
+                            itemBuilder: (context, index) {
+                              final mvtCaisse = data[index];
+                              return Container(
+                                margin: const EdgeInsets.all(5.0),
+                                color: Colors.white,
+                                child: ListTile(
+                                  leading: mvtCaisse.typeMouvement == "Sortie"
+                                      ? const Icon(Icons.arrow_back,
+                                          color: Colors.red)
+                                      : const Icon(Icons.arrow_forward,
+                                          color: Colors.green),
+                                  title: Text(
+                                      '${Utils.timeShort.format(mvtCaisse.dateMaj)} - ${mvtCaisse.details}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontSize: 14)),
+                                  trailing: mvtCaisse.typeMouvement == "Sortie"
+                                      ? Text(
+                                          '-${Utils.formatCFA(mvtCaisse.montant)}',
                                           style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: Colors.red)),
-                                    ),
-                                  ],
-                                );
-                              },
-                              error: (e, s) =>
-                                  const Text('Une erreur est survenue'),
-                              loading: () => const Center(
-                                  child: CircularProgressIndicator())))),
-                  mvtsCaisse.when(
-                      data: (data) {
-                        return Expanded(
-                            child: ListView.builder(
-                                itemCount: data.length,
-                                itemBuilder: (context, index) {
-                                  final mvtCaisse = data[index];
-                                  return Container(
-                                    margin: const EdgeInsets.all(5.0),
-                                    color: Colors.white,
-                                    child: ListTile(
-                                      leading:
-                                          mvtCaisse.typeMouvement == "Sortie"
-                                              ? const Icon(Icons.arrow_back,
-                                                  color: Colors.red)
-                                              : const Icon(Icons.arrow_forward,
-                                                  color: Colors.green),
-                                      title: Text(
-                                          '${Utils.timeShort.format(mvtCaisse.dateMaj)} - ${mvtCaisse.details}',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                              fontSize: 14, color: Colors.red))
+                                      : Text(Utils.formatCFA(mvtCaisse.montant),
                                           style: const TextStyle(fontSize: 14)),
-                                      trailing: mvtCaisse.typeMouvement ==
-                                              "Sortie"
-                                          ? Text(
-                                              '-${Utils.formatCFA(mvtCaisse.montant)}',
-                                              style: const TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.red))
-                                          : Text(
-                                              Utils.formatCFA(
-                                                  mvtCaisse.montant),
-                                              style: const TextStyle(
-                                                  fontSize: 14)),
-                                    ),
-                                  );
-                                }));
-                      },
-                      error: (e, s) => const Text('Une erreur est survenue'),
-                      loading: () =>
-                          const Center(child: CircularProgressIndicator()))
-                ],
-              )),
+                                ),
+                              );
+                            }));
+                  },
+                  error: (e, s) => const Text('Une erreur est survenue'),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()))
+            ],
+          ),
           Container(
               color: Colors.grey.shade100,
               child: Column(children: [
@@ -294,49 +286,6 @@ class Dashboard extends ConsumerWidget {
                             const Center(child: CircularProgressIndicator())),
                   ),
                 ),
-
-                /* prestations.when(
-                  data: (value) {
-                    final listPrestations = value.docs
-                        .where((element) => element['accountId'] == auth.userId)
-                        .where((element) => element['caisseId'] == caisseId)
-                        .map((e) => Prestation.fromFirestore(e))
-                        .toList();
-                    return Expanded(
-                      child: ListView.builder(
-                          itemCount: listPrestations.length,
-                          itemBuilder: (context, index) {
-                            final prestation = listPrestations[index];
-                            return GestureDetector(
-                              onLongPress: () {
-                                infosPrestation(context, prestation);
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.all(5.0),
-                                color: Colors.white,
-                                child: ListTile(
-                                    leading: Text(
-                                        Utils.dateShort
-                                            .format(prestation.datePrestation),
-                                        style: const TextStyle(fontSize: 14)),
-                                    title: Text(prestation.detailsVehicule,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(fontSize: 14)),
-                                    trailing: Text(
-                                        Utils.formatCFA(prestation.prix),
-                                        style: const TextStyle(fontSize: 14))),
-                              ),
-                            );
-                          }),
-                    );
-                  },
-                  error: (error, stackTrace) {
-                    return Text(error.toString());
-                  },
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                ) */
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
                       stream: firestoreService.getPrestations(),
@@ -455,7 +404,6 @@ class Dashboard extends ConsumerWidget {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(fontSize: 14)),
-                                    //subtitle: Text(prestations[index].detailsVehicule),
                                     trailing: Text(
                                         Utils.formatCFA(prestation.prix),
                                         style: const TextStyle(fontSize: 14)),
