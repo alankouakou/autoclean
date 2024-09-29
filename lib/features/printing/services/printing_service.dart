@@ -184,7 +184,8 @@ class PrintingService {
             //pw.TableHelper.fromTextArray(headers:,data: dataPrestations)
           ]);
         }));
-
+/*     print('adding prestations page to the report!');
+    print(mvtPrestations); */
     pdf.addPage(pw.Page(
         pageFormat: PdfPageFormat.a4,
         orientation: pw.PageOrientation.portrait,

@@ -43,10 +43,18 @@ class LaveurNotifier extends AsyncNotifier<List<Laveur>> {
         .where('accountId', isEqualTo: accountId)
         .orderBy('dateCreated', descending: true)
         .get();
-    //print('Inside firestore service: ${results.docs.length}');
+
     final listLaveurs =
         results.docs.map((obj) => Laveur.fromFirestore(obj)).toList();
 
     return listLaveurs;
+  }
+
+  Future<String> getNameById(String id) async {
+    if (id.isNotEmpty) {
+      final myDocument = await laveursCollection.doc(id).get();
+      return myDocument['nom'];
+    }
+    return '';
   }
 }

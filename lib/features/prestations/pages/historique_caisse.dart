@@ -1,3 +1,4 @@
+import 'package:autoclean/features/laveurs/services/laveur_notifier.dart';
 import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
 import 'package:autoclean/features/prestations/services/histo_prestation_provider.dart';
 import 'package:flutter/material.dart';
@@ -337,8 +338,11 @@ class HistoriqueCaisse extends ConsumerWidget {
                           itemBuilder: (context, index) {
                             final prestation = listPrestations[index];
                             return GestureDetector(
-                              onLongPress: () {
-                                infosPrestation(context, prestation);
+                              onLongPress: () async {
+                                final nomLaveur = await ref
+                                    .read(laveurProvider.notifier)
+                                    .getNameById(prestation.laveur);
+                                infosPrestation(context, prestation, nomLaveur);
                               },
                               child: Container(
                                 margin: const EdgeInsets.all(5.0),
@@ -430,14 +434,15 @@ class HistoriqueCaisse extends ConsumerWidget {
     );
   }
 
-  void infosPrestation(BuildContext context, Prestation prestation) {
+  void infosPrestation(
+      BuildContext context, Prestation prestation, String nomLaveur) {
     showModalBottomSheet(
         context: context,
         builder: (context) => Container(
               padding: const EdgeInsets.symmetric(vertical: 10),
               alignment: Alignment.topCenter,
               width: double.infinity,
-              height: 350,
+              height: 400,
               //height: 300,
               child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -455,6 +460,10 @@ class HistoriqueCaisse extends ConsumerWidget {
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     Text(Utils.dateFull.format(prestation.datePrestation)),
+                    Text('Laveur: $nomLaveur',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
                     const SizedBox(height: 10),
                     Text(prestation.caisseId!),
                     Text(prestation.accountId),

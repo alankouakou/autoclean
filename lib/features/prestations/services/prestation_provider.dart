@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:autoclean/features/authentification/services/auth_service.dart';
 import 'package:autoclean/features/prestations/models/prestation.dart';
-import 'package:autoclean/features/prestations/services/caisse_service.dart';
 import 'package:autoclean/features/prestations/services/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

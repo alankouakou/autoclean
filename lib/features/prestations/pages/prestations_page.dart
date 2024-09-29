@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:autoclean/features/authentification/services/auth_service.dart';
+import 'package:autoclean/features/laveurs/services/laveur_notifier.dart';
 
 import 'package:autoclean/features/prestations/pages/point_caisse.dart';
 import 'package:autoclean/features/prestations/services/firestore_service.dart';
@@ -198,21 +199,24 @@ class PrestationsPage extends ConsumerWidget {
                           height: 50,
                           child: optionsTarif.when(
                               data: (tarif) {
-                                return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: tarif.options
-                                        .map((option) => Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: OptionTarifWidget(
-                                                option: option,
-                                                couleur: couleurs[Random()
-                                                    .nextInt(
-                                                        couleurs.length - 1)],
-                                              ),
-                                            ))
-                                        .toList());
+                                return Container(
+                                  color: Colors.white,
+                                  child: ListView(
+                                      scrollDirection: Axis.horizontal,
+                                      children: tarif.options
+                                          .map((option) => Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 5.0),
+                                                child: OptionTarifWidget(
+                                                  option: option,
+                                                  couleur: couleurs[Random()
+                                                      .nextInt(
+                                                          couleurs.length - 1)],
+                                                ),
+                                              ))
+                                          .toList()),
+                                );
                               },
                               error: (e, s) => null,
                               loading: () => const Center(
@@ -238,7 +242,10 @@ class PrestationsPage extends ConsumerWidget {
                                     final prestation = Prestation.fromFirestore(
                                         prestations[index]);
                                     return GestureDetector(
-                                      onLongPress: () {
+                                      onLongPress: () async {
+                                        final nomLaveur = await ref
+                                            .read(laveurProvider.notifier)
+                                            .getNameById(prestation.laveur);
                                         showModalBottomSheet(
                                             context: context,
                                             builder: (context) => Container(
@@ -247,7 +254,7 @@ class PrestationsPage extends ConsumerWidget {
                                                   alignment:
                                                       Alignment.topCenter,
                                                   width: double.infinity,
-                                                  height: 350,
+                                                  height: 400,
                                                   //height: 300,
                                                   child: Column(
                                                       mainAxisSize:
@@ -287,10 +294,17 @@ class PrestationsPage extends ConsumerWidget {
                                                         Text(Utils.dateFull
                                                             .format(prestation
                                                                 .datePrestation)),
+                                                        Text(
+                                                            'Laveur: $nomLaveur',
+                                                            style: const TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
                                                         const SizedBox(
                                                             height: 10),
                                                         Text(prestation
-                                                            .caisseId!),
+                                                            .caisseId),
                                                         Text(prestation
                                                             .accountId),
                                                         const SizedBox(

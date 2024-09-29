@@ -1,15 +1,13 @@
 import 'package:autoclean/features/authentification/services/auth_service.dart';
-import 'package:autoclean/features/prestations/pages/prestations_page.dart';
 import 'package:autoclean/features/prestations/services/caisse_notifier.dart';
 import 'package:autoclean/features/prestations/services/firestore_service.dart';
-import 'package:autoclean/features/prestations/services/histo_prestation_provider.dart';
 import 'package:autoclean/features/prestations/services/prestation_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils.dart';
+import '../../laveurs/services/laveur_notifier.dart';
 import '../../printing/services/printing_service.dart';
 import '../models/prestation.dart';
 import '../services/histo_mvt_caisse_provider.dart';
@@ -359,7 +357,10 @@ class Dashboard extends ConsumerWidget {
                               final prestation =
                                   Prestation.fromFirestore(prestations[index]);
                               return GestureDetector(
-                                onLongPress: () {
+                                onLongPress: () async {
+                                  final nomLaveur = await ref
+                                      .read(laveurProvider.notifier)
+                                      .getNameById(prestation.laveur);
                                   showModalBottomSheet(
                                       context: context,
                                       builder: (context) => Container(
@@ -367,7 +368,7 @@ class Dashboard extends ConsumerWidget {
                                                 vertical: 10),
                                             alignment: Alignment.topCenter,
                                             width: double.infinity,
-                                            height: 350,
+                                            height: 400,
                                             //height: 300,
                                             child: Column(
                                                 mainAxisSize: MainAxisSize.min,
@@ -399,6 +400,11 @@ class Dashboard extends ConsumerWidget {
                                                   Text(Utils.dateFull.format(
                                                       prestation
                                                           .datePrestation)),
+                                                  Text('Laveur: $nomLaveur',
+                                                      style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
                                                   const SizedBox(height: 10),
                                                   Text(prestation.caisseId!),
                                                   Text(prestation.accountId),
